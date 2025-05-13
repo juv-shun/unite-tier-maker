@@ -97,7 +97,6 @@ const TierList: React.FC = () => {
             borderRadius: '5px'
           }}
         >
-          <h2 style={{ marginBottom: '10px' }}>利用可能なポケモン</h2>
           <div style={{ display: 'flex', flexWrap: 'wrap' }}>
             {unassignedPokemon.map((pokemon) => (
               <DraggablePokemon key={pokemon.id} pokemon={pokemon} />
