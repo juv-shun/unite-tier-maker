@@ -17,14 +17,16 @@ const TIERS = [
 interface PokemonAssignment {
   pokemonId: string;
   location: string; // 'unassigned' または Tierの ID
+  position: number; // Tier内での位置（順序）
 }
 
 const TierList: React.FC = () => {
   // 各ポケモンの配置情報を管理する状態
   const [assignments, setAssignments] = useState<PokemonAssignment[]>(
-    pokemonList.map(pokemon => ({
+    pokemonList.map((pokemon, index) => ({
       pokemonId: pokemon.id,
-      location: 'unassigned'
+      location: 'unassigned',
+      position: index
     }))
   );
 
@@ -33,10 +35,11 @@ const TierList: React.FC = () => {
     return pokemonList.find(pokemon => pokemon.id === id);
   }, []);
 
-  // 特定の場所に配置されているポケモンを取得するヘルパー関数
+  // 特定の場所に配置されているポケモンを取得するヘルパー関数（位置順にソート）
   const getPokemonsByLocation = useCallback((location: string): Pokemon[] => {
     return assignments
       .filter(assignment => assignment.location === location)
+      .sort((a, b) => a.position - b.position) // 位置でソート
       .map(assignment => {
         const pokemon = getPokemonById(assignment.pokemonId);
         if (!pokemon) return null;
@@ -47,21 +50,65 @@ const TierList: React.FC = () => {
 
   // ドロップされた時のハンドラー
   const handleDrop = useCallback((pokemonId: string, targetLocation: string) => {
-    setAssignments(prev => 
-      prev.map(assignment => 
+    setAssignments(prev => {
+      // 同じロケーションのポケモンの最大ポジションを取得
+      const maxPosition = Math.max(
+        ...prev
+          .filter(a => a.location === targetLocation)
+          .map(a => a.position),
+        -1
+      );
+
+      return prev.map(assignment => 
         assignment.pokemonId === pokemonId
-          ? { ...assignment, location: targetLocation }
+          ? { ...assignment, location: targetLocation, position: maxPosition + 1 }
           : assignment
-      )
-    );
+      );
+    });
+  }, []);
+
+  // 同じTier内でのポケモンの位置を変更するハンドラー
+  const handleReorderPokemon = useCallback((pokemonId: string, sourceIndex: number, targetIndex: number, tierLocation: string) => {
+    setAssignments(prev => {
+      // 同じTier内のポケモンのみフィルタリング
+      const tierPokemons = prev
+        .filter(a => a.location === tierLocation)
+        .sort((a, b) => a.position - b.position);
+      
+      // ドラッグしているポケモンのインデックスを見つける
+      const pokemonIndex = tierPokemons.findIndex(p => p.pokemonId === pokemonId);
+      
+      if (pokemonIndex === -1) return prev; // ポケモンが見つからない場合は何もしない
+      
+      // 配列内で位置を入れ替える
+      const newOrder = [...tierPokemons];
+      const [removed] = newOrder.splice(pokemonIndex, 1);
+      newOrder.splice(targetIndex, 0, removed);
+      
+      // 新しい位置情報を割り当てる
+      const updatedPokemonIds = newOrder.map(p => p.pokemonId);
+      
+      return prev.map(assignment => {
+        if (assignment.location !== tierLocation) return assignment;
+        
+        const newIndex = updatedPokemonIds.indexOf(assignment.pokemonId);
+        if (newIndex === -1) return assignment;
+        
+        return {
+          ...assignment,
+          position: newIndex
+        };
+      });
+    });
   }, []);
 
   // リセットボタンのハンドラー
   const handleResetTiers = useCallback(() => {
     setAssignments(
-      pokemonList.map(pokemon => ({
+      pokemonList.map((pokemon, index) => ({
         pokemonId: pokemon.id,
-        location: 'unassigned'
+        location: 'unassigned',
+        position: index
       }))
     );
   }, []);
@@ -84,6 +131,7 @@ const TierList: React.FC = () => {
               color={tier.color}
               pokemon={getPokemonsByLocation(tier.id)}
               onDrop={handleDrop}
+              onReorder={handleReorderPokemon}
             />
           ))}
         </div>

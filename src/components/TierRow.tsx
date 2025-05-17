@@ -8,9 +8,10 @@ interface TierRowProps {
   color: string;
   pokemon: Pokemon[];
   onDrop: (pokemonId: string, tierId: string) => void;
+  onReorder: (pokemonId: string, sourceIndex: number, targetIndex: number, tierLocation: string) => void;
 }
 
-const TierRow: React.FC<TierRowProps> = ({ tier, color, pokemon, onDrop }) => {
+const TierRow: React.FC<TierRowProps> = ({ tier, color, pokemon, onDrop, onReorder }) => {
   const ref = useRef<HTMLDivElement>(null);
   
   const [{ isOver }, connectDrop] = useDrop<{ id: string }, void, { isOver: boolean }>(() => ({
@@ -56,8 +57,14 @@ const TierRow: React.FC<TierRowProps> = ({ tier, color, pokemon, onDrop }) => {
           padding: '5px',
         }}
       >
-        {pokemon.map((p) => (
-          <DraggablePokemon key={p.id} pokemon={p} />
+        {pokemon.map((p, index) => (
+          <DraggablePokemon 
+            key={p.id} 
+            pokemon={p} 
+            index={index}
+            tierLocation={tier}
+            onReorder={(sourceIndex, targetIndex) => onReorder(p.id, sourceIndex, targetIndex, tier)}
+          />
         ))}
       </div>
     </div>
