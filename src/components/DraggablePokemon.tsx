@@ -1,12 +1,7 @@
 import React, { useRef } from 'react';
 import { useDrag, useDrop, XYCoord } from 'react-dnd'; 
 import { Pokemon } from '../data/pokemon';
-
-export interface DragItem {
-  id: string;
-  originalIndex: number;
-  originalTierLocation: string;
-}
+import { DragItem, DND_ITEM_TYPE } from '../types';
 
 interface DraggablePokemonProps {
   pokemon: Pokemon;
@@ -24,7 +19,7 @@ const DraggablePokemon: React.FC<DraggablePokemonProps> = ({ pokemon, index, tie
     { isDragging: boolean } 
   >(
     () => ({
-      type: 'pokemon', 
+      type: DND_ITEM_TYPE, 
       item: { id: pokemon.id, originalIndex: index, originalTierLocation: tierLocation },
       collect: (monitor) => ({
         isDragging: !!monitor.isDragging(),
@@ -39,7 +34,7 @@ const DraggablePokemon: React.FC<DraggablePokemonProps> = ({ pokemon, index, tie
     { isOver: boolean; canDrop: boolean } 
   >(
     () => ({
-      accept: 'pokemon',
+      accept: DND_ITEM_TYPE,
       hover: (draggedItem: DragItem, monitor) => { 
         if (!ref.current) return;
         if (draggedItem.id === pokemon.id) return;

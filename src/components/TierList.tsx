@@ -4,17 +4,18 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 import { Pokemon, pokemonList } from '../data/pokemon';
 import TierRow from './TierRow';
 import DraggablePokemon from './DraggablePokemon';
-import { useTierManagement, TIERS as tierDefinitions, PokemonAssignment } from '../hooks/useTierManagement';
+import { useTierManagement } from '../hooks/useTierManagement';
+import { TIERS } from '../constants/tiers';
+import { PokemonAssignment, TierId } from '../types';
 
 const TierList: React.FC = () => {
   const {
-    TIERS,
     getPokemonsByLocation,
     handleMovePokemon,
     handleResetTiers,
   } = useTierManagement();
 
-  const unassignedPokemon = getPokemonsByLocation('unassigned');
+  const unassignedPokemon = getPokemonsByLocation(TierId.UNASSIGNED);
 
   return (
     <DndProvider backend={HTML5Backend}>
@@ -49,7 +50,7 @@ const TierList: React.FC = () => {
               <DraggablePokemon 
                 key={pokemon.id} 
                 pokemon={pokemon} 
-                tierLocation="unassigned"
+                tierLocation={TierId.UNASSIGNED}
                 index={index} 
                 onMove={handleMovePokemon}
               />

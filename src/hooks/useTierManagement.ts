@@ -1,27 +1,15 @@
 import { useState, useCallback } from 'react';
 import { Pokemon, pokemonList } from '../data/pokemon';
+import { PokemonAssignment, TierId } from '../types';
+import { TIERS } from '../constants/tiers';
 
-// Tierの定義
-export const TIERS = [
-  { id: 'S', color: '#FF7F7F' }, // 赤
-  { id: 'A', color: '#FFBF7F' }, // オレンジ
-  { id: 'B', color: '#FFFF7F' }, // 黄色
-  { id: 'C', color: '#7FFF7F' }, // 緑
-  { id: 'D', color: '#7FBFFF' }, // 青
-];
-
-// 配置情報を管理するためのインターフェイス
-export interface PokemonAssignment {
-  pokemonId: string;
-  location: string; // 'unassigned' または Tierの ID
-  position: number; // Tier内での位置（順序）
-}
+// 型定義とTIERSは types と constants に移動しました
 
 export const useTierManagement = () => {
   const [assignments, setAssignments] = useState<PokemonAssignment[]>(
     pokemonList.map((pokemon, index) => ({
       pokemonId: pokemon.id,
-      location: 'unassigned',
+      location: TierId.UNASSIGNED,
       position: index
     }))
   );
@@ -85,14 +73,13 @@ export const useTierManagement = () => {
     setAssignments(
       pokemonList.map((pokemon, index) => ({
         pokemonId: pokemon.id,
-        location: 'unassigned',
+        location: TierId.UNASSIGNED,
         position: index
       }))
     );
   }, []);
 
   return {
-    TIERS,
     assignments, // フェーズ2以降で内部状態にするか検討
     getPokemonsByLocation,
     handleMovePokemon,

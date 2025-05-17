@@ -1,7 +1,8 @@
 import React, { useRef } from 'react';
 import { useDrop } from 'react-dnd';
 import { Pokemon } from '../data/pokemon';
-import DraggablePokemon, { DragItem } from './DraggablePokemon';
+import DraggablePokemon from './DraggablePokemon';
+import { DragItem, DND_ITEM_TYPE } from '../types';
 
 interface TierRowProps {
   tier: string;
@@ -18,7 +19,7 @@ const TierRow: React.FC<TierRowProps> = ({ tier, color, pokemon, onMovePokemon }
     void, 
     { isOver: boolean }
   >(() => ({
-    accept: 'pokemon',
+    accept: DND_ITEM_TYPE,
     drop: (item: DragItem) => {
       // TierRowの空きスペースにドロップされた場合
       // ドラッグ元のTierとドロップ先のTierが異なる場合に、このTierの末尾に追加
