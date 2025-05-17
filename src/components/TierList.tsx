@@ -48,57 +48,47 @@ const TierList: React.FC = () => {
       .filter((pokemon): pokemon is Pokemon => pokemon !== null);
   }, [assignments, getPokemonById]);
 
-  // ドロップされた時のハンドラー
-  const handleDrop = useCallback((pokemonId: string, targetLocation: string) => {
-    setAssignments(prev => {
-      // 同じロケーションのポケモンの最大ポジションを取得
-      const maxPosition = Math.max(
-        ...prev
-          .filter(a => a.location === targetLocation)
-          .map(a => a.position),
-        -1
-      );
+  const handleMovePokemon = useCallback(( 
+    draggedPokemonId: string,
+    targetTierLocation: string, 
+    targetIndexInTier: number | undefined // targetTierLocation内での挿入位置index、undefinedなら末尾
+  ) => {
+    setAssignments(prevAssignments => {
+      const assignmentsCopy = prevAssignments.map(a => ({ ...a }));
 
-      return prev.map(assignment => 
-        assignment.pokemonId === pokemonId
-          ? { ...assignment, location: targetLocation, position: maxPosition + 1 }
-          : assignment
-      );
-    });
-  }, []);
+      const draggedPokemonAssignment = assignmentsCopy.find(a => a.pokemonId === draggedPokemonId);
+      if (!draggedPokemonAssignment) return prevAssignments;
 
-  // 同じTier内でのポケモンの位置を変更するハンドラー
-  const handleReorderPokemon = useCallback((pokemonId: string, sourceIndex: number, targetIndex: number, tierLocation: string) => {
-    setAssignments(prev => {
-      // 同じTier内のポケモンのみフィルタリング
-      const tierPokemons = prev
-        .filter(a => a.location === tierLocation)
-        .sort((a, b) => a.position - b.position);
-      
-      // ドラッグしているポケモンのインデックスを見つける
-      const pokemonIndex = tierPokemons.findIndex(p => p.pokemonId === pokemonId);
-      
-      if (pokemonIndex === -1) return prev; // ポケモンが見つからない場合は何もしない
-      
-      // 配列内で位置を入れ替える
-      const newOrder = [...tierPokemons];
-      const [removed] = newOrder.splice(pokemonIndex, 1);
-      newOrder.splice(targetIndex, 0, removed);
-      
-      // 新しい位置情報を割り当てる
-      const updatedPokemonIds = newOrder.map(p => p.pokemonId);
-      
-      return prev.map(assignment => {
-        if (assignment.location !== tierLocation) return assignment;
-        
-        const newIndex = updatedPokemonIds.indexOf(assignment.pokemonId);
-        if (newIndex === -1) return assignment;
-        
-        return {
-          ...assignment,
-          position: newIndex
-        };
+      // 1. ドラッグされたポケモンを一時的に取り除く (後で正しい位置に挿入するため)
+      const filteredAssignments = assignmentsCopy.filter(a => a.pokemonId !== draggedPokemonId);
+
+      // 2. 各Tierのポケモンリストを再構築し、順序を正規化する
+      const newTiersState: Record<string, PokemonAssignment[]> = {};
+      const allTierIds = [...TIERS.map(t => t.id), 'unassigned'];
+
+      allTierIds.forEach(tierId => {
+        newTiersState[tierId] = filteredAssignments
+          .filter(a => a.location === tierId)
+          .sort((a, b) => a.position - b.position);
       });
+
+      // 3. ドラッグされたポケモンをターゲットTierの指定位置に挿入
+      draggedPokemonAssignment.location = targetTierLocation;
+      if (targetIndexInTier !== undefined) {
+        newTiersState[targetTierLocation].splice(targetIndexInTier, 0, draggedPokemonAssignment);
+      } else {
+        newTiersState[targetTierLocation].push(draggedPokemonAssignment); // 末尾に追加
+      }
+
+      // 4. 全てのポケモンの位置を再採番し、最終的なリストを生成
+      const finalAssignments: PokemonAssignment[] = [];
+      allTierIds.forEach(tierId => {
+        newTiersState[tierId].forEach((pokemon, index) => {
+          pokemon.position = index;
+          finalAssignments.push(pokemon);
+        });
+      });
+      return finalAssignments;
     });
   }, []);
 
@@ -130,8 +120,7 @@ const TierList: React.FC = () => {
               tier={tier.id}
               color={tier.color}
               pokemon={getPokemonsByLocation(tier.id)}
-              onDrop={handleDrop}
-              onReorder={handleReorderPokemon}
+              onMovePokemon={handleMovePokemon}
             />
           ))}
         </div>
@@ -146,8 +135,14 @@ const TierList: React.FC = () => {
           }}
         >
           <div style={{ display: 'flex', flexWrap: 'wrap' }}>
-            {unassignedPokemon.map((pokemon) => (
-              <DraggablePokemon key={pokemon.id} pokemon={pokemon} />
+            {unassignedPokemon.map((pokemon, index) => (
+              <DraggablePokemon 
+                key={pokemon.id} 
+                pokemon={pokemon} 
+                tierLocation="unassigned"
+                index={index} // unassignedエリア内でのindex
+                onMove={handleMovePokemon} // 未配置エリアのポケモンも移動できるようにする
+              />
             ))}
           </div>
         </div>

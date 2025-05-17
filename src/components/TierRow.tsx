@@ -1,23 +1,33 @@
 import React, { useRef } from 'react';
 import { useDrop } from 'react-dnd';
 import { Pokemon } from '../data/pokemon';
-import DraggablePokemon from './DraggablePokemon';
+import DraggablePokemon, { DragItem } from './DraggablePokemon';
 
 interface TierRowProps {
   tier: string;
   color: string;
   pokemon: Pokemon[];
-  onDrop: (pokemonId: string, tierId: string) => void;
-  onReorder: (pokemonId: string, sourceIndex: number, targetIndex: number, tierLocation: string) => void;
+  onMovePokemon: (draggedPokemonId: string, targetTierLocation: string, targetIndexInTier: number | undefined) => void;
 }
 
-const TierRow: React.FC<TierRowProps> = ({ tier, color, pokemon, onDrop, onReorder }) => {
+const TierRow: React.FC<TierRowProps> = ({ tier, color, pokemon, onMovePokemon }) => {
   const ref = useRef<HTMLDivElement>(null);
   
-  const [{ isOver }, connectDrop] = useDrop<{ id: string }, void, { isOver: boolean }>(() => ({
+  const [{ isOver }, connectDrop] = useDrop<
+    DragItem, 
+    void, 
+    { isOver: boolean }
+  >(() => ({
     accept: 'pokemon',
-    drop: (item: { id: string }) => {
-      onDrop(item.id, tier);
+    drop: (item: DragItem) => {
+      // TierRowの空きスペースにドロップされた場合
+      // ドラッグ元のTierとドロップ先のTierが異なる場合に、このTierの末尾に追加
+      if (item.originalTierLocation !== tier) {
+        onMovePokemon(item.id, tier, undefined); 
+      }
+      // 同じTier内での移動で、Tierの空きスペースにドロップされた場合の処理は、
+      // DraggablePokemonのhoverによる並び替えに任せるか、ここで明示的に末尾に追加するか検討の余地あり。
+      // 現状では、異なるTierからの移動のみをここで処理。
       return undefined;
     },
     collect: (monitor) => ({
@@ -25,7 +35,6 @@ const TierRow: React.FC<TierRowProps> = ({ tier, color, pokemon, onDrop, onReord
     }),
   }));
 
-  // connectDropを直接呼び出す
   connectDrop(ref);
 
   return (
@@ -61,9 +70,9 @@ const TierRow: React.FC<TierRowProps> = ({ tier, color, pokemon, onDrop, onReord
           <DraggablePokemon 
             key={p.id} 
             pokemon={p} 
-            index={index}
-            tierLocation={tier}
-            onReorder={(sourceIndex, targetIndex) => onReorder(p.id, sourceIndex, targetIndex, tier)}
+            index={index} 
+            tierLocation={tier} 
+            onMove={onMovePokemon}
           />
         ))}
       </div>

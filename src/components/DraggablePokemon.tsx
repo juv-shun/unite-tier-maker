@@ -1,81 +1,71 @@
 import React, { useRef } from 'react';
-import { useDrag, useDrop } from 'react-dnd';
+import { useDrag, useDrop, XYCoord } from 'react-dnd'; 
 import { Pokemon } from '../data/pokemon';
+
+export interface DragItem {
+  id: string;
+  originalIndex: number;
+  originalTierLocation: string;
+}
 
 interface DraggablePokemonProps {
   pokemon: Pokemon;
-  index?: number;  // Tier内での位置
-  tierLocation?: string;  // 所属するTierの位置
-  onReorder?: (sourceIndex: number, targetIndex: number) => void;  // 並び替え時のコールバック
+  index: number;  
+  tierLocation: string;  
+  onMove: (draggedPokemonId: string, targetTierLocation: string, targetIndexInTier: number | undefined) => void;
 }
 
-const DraggablePokemon: React.FC<DraggablePokemonProps> = ({ pokemon, index, tierLocation, onReorder }) => {
+const DraggablePokemon: React.FC<DraggablePokemonProps> = ({ pokemon, index, tierLocation, onMove }) => {
   const ref = useRef<HTMLDivElement>(null);
   
-  // ドラッグの設定
-  const [{ isDragging }, connectDrag] = useDrag<
-    { id: string; index: number | undefined; tierLocation: string | undefined },
-    void,
-    { isDragging: boolean }
-  >(() => ({
-    type: 'pokemon',
-    item: { id: pokemon.id, index, tierLocation },
-    collect: (monitor) => ({
-      isDragging: !!monitor.isDragging(),
+  const [{ isDragging }, drag, preview] = useDrag<
+    DragItem, 
+    void,    
+    { isDragging: boolean } 
+  >(
+    () => ({
+      type: 'pokemon', 
+      item: { id: pokemon.id, originalIndex: index, originalTierLocation: tierLocation },
+      collect: (monitor) => ({
+        isDragging: !!monitor.isDragging(),
+      }),
     }),
-    canDrag: true,
-  }));
+    [pokemon, index, tierLocation, onMove]
+  );
 
-  // 同じTier内でのドロップの設定（順序変更用）
-  const [{ isOver }, connectDrop] = useDrop<
-    { id: string; index: number | undefined; tierLocation: string | undefined },
-    void,
-    { isOver: boolean }
-  >(() => ({
-    accept: 'pokemon',
-    hover: (item, monitor) => {
-      // 同じTier内での並び替えのみをサポート
-      if (!ref.current || 
-          item.id === pokemon.id || 
-          item.tierLocation !== tierLocation || 
-          item.tierLocation === 'unassigned' || 
-          tierLocation === 'unassigned' || 
-          item.index === undefined || 
-          index === undefined) {
-        return;
-      }
+  const [{ isOver, canDrop: dropCanDrop }, drop] = useDrop<
+    DragItem, 
+    void,    
+    { isOver: boolean; canDrop: boolean } 
+  >(
+    () => ({
+      accept: 'pokemon',
+      hover: (draggedItem: DragItem, monitor) => { 
+        if (!ref.current) return;
+        if (draggedItem.id === pokemon.id) return;
 
-      // ドラッグ中のアイテムの位置とドロップ先の位置を比較
-      const dragIndex = item.index;
-      const hoverIndex = index;
+        const hoverIndex = index;
+        onMove(draggedItem.id, tierLocation, hoverIndex);
 
-      // 同じ位置の場合は何もしない
-      if (dragIndex === hoverIndex) {
-        return;
-      }
-
-      // 並び替えのコールバックを呼び出す
-      if (onReorder) {
-        onReorder(dragIndex, hoverIndex);
-      }
-
-      // ポインタの位置情報を更新
-      item.index = hoverIndex;
-    },
-    collect: (monitor) => ({
-      isOver: !!monitor.isOver(),
+        draggedItem.originalIndex = hoverIndex;
+        draggedItem.originalTierLocation = tierLocation;
+      },
+      canDrop: (draggedItem: DragItem) => { 
+        return draggedItem.id !== pokemon.id;
+      },
+      collect: (monitor) => ({
+        isOver: !!monitor.isOver() && monitor.canDrop(),
+        canDrop: !!monitor.canDrop(), 
+      }),
     }),
-  }));
+    [pokemon, index, tierLocation, onMove]
+  );
 
-  // dragとdropの両方の参照を結合
-  const dragDropRef = (node: HTMLDivElement | null) => {
-    connectDrag(node);
-    connectDrop(node);
-  };
+  drag(drop(ref));
 
   return (
     <div
-      ref={dragDropRef}
+      ref={ref} 
       style={{
         opacity: isDragging ? 0.5 : 1,
         cursor: 'move',
@@ -83,7 +73,7 @@ const DraggablePokemon: React.FC<DraggablePokemonProps> = ({ pokemon, index, tie
         height: '60px',
         margin: '5px',
         display: 'inline-block',
-        backgroundColor: isOver ? 'rgba(0, 255, 0, 0.1)' : 'transparent',
+        backgroundColor: isOver && dropCanDrop ? 'rgba(0, 255, 0, 0.1)' : 'transparent', 
         borderRadius: '4px',
       }}
     >
