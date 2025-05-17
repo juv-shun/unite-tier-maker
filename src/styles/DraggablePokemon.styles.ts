@@ -8,7 +8,8 @@ export const PokemonContainer = styled.div<{ isDragging: boolean; isOver: boolea
   cursor: move;
   width: 60px;
   height: 60px;
-  margin: 5px;
+  margin-top: 5px;
+  margin-bottom: 5px;
   display: inline-block;
   background-color: ${props => props.isOver && props.canDrop ? 'rgba(0, 255, 0, 0.1)' : 'transparent'};
   border-radius: 4px;

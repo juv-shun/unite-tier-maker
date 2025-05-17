@@ -5,7 +5,7 @@ import styled from '@emotion/styled';
  */
 export const TierRowContainer = styled.div`
   display: flex;
-  margin-bottom: 10px;
+  margin-bottom: 5px;
 `;
 
 export const TierLabel = styled.div<{ backgroundColor: string }>`
@@ -25,6 +25,5 @@ export const TierContent = styled.div<{ isOver: boolean }>`
   background-color: ${props => props.isOver ? 'rgba(0, 0, 0, 0.1)' : 'rgba(0, 0, 0, 0.05)'};
   display: flex;
   flex-wrap: wrap;
-  padding: 5px;
   transition: background-color 0.2s ease;
 `;
