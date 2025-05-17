@@ -1,8 +1,9 @@
-import React, { useRef } from 'react';
+import React, { useRef, memo } from 'react';
 import { useDrop } from 'react-dnd';
 import { Pokemon } from '../data/pokemon';
 import DraggablePokemon from './DraggablePokemon';
 import { DragItem, DND_ITEM_TYPE } from '../types';
+import { TierRowContainer, TierLabel, TierContent } from '../styles/TierRow.styles';
 
 interface TierRowProps {
   tier: string;
@@ -39,34 +40,11 @@ const TierRow: React.FC<TierRowProps> = ({ tier, color, pokemon, onMovePokemon }
   connectDrop(ref);
 
   return (
-    <div className="tier-row" style={{ display: 'flex', marginBottom: '10px' }}>
-      <div
-        className="tier-label"
-        style={{
-          backgroundColor: color,
-          color: 'white',
-          fontWeight: 'bold',
-          padding: '10px',
-          width: '50px',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}
-      >
+    <TierRowContainer>
+      <TierLabel backgroundColor={color}>
         {tier}
-      </div>
-      <div
-        ref={ref}
-        className="tier-content"
-        style={{
-          flex: 1,
-          minHeight: '70px',
-          backgroundColor: isOver ? 'rgba(0, 0, 0, 0.1)' : 'rgba(0, 0, 0, 0.05)',
-          display: 'flex',
-          flexWrap: 'wrap',
-          padding: '5px',
-        }}
-      >
+      </TierLabel>
+      <TierContent ref={ref} isOver={isOver}>
         {pokemon.map((p, index) => (
           <DraggablePokemon 
             key={p.id} 
@@ -76,9 +54,10 @@ const TierRow: React.FC<TierRowProps> = ({ tier, color, pokemon, onMovePokemon }
             onMove={onMovePokemon}
           />
         ))}
-      </div>
-    </div>
+      </TierContent>
+    </TierRowContainer>
   );
 };
 
-export default TierRow;
+// React.memoでコンポーネントをメモ化し、不要な再レンダリングを防止
+export default memo(TierRow);

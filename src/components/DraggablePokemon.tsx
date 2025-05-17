@@ -1,7 +1,8 @@
-import React, { useRef } from 'react';
+import React, { useRef, memo } from 'react';
 import { useDrag, useDrop, XYCoord } from 'react-dnd'; 
 import { Pokemon } from '../data/pokemon';
 import { DragItem, DND_ITEM_TYPE } from '../types';
+import { PokemonContainer, PokemonImage } from '../styles/DraggablePokemon.styles';
 
 interface DraggablePokemonProps {
   pokemon: Pokemon;
@@ -59,27 +60,20 @@ const DraggablePokemon: React.FC<DraggablePokemonProps> = ({ pokemon, index, tie
   drag(drop(ref));
 
   return (
-    <div
+    <PokemonContainer
       ref={ref} 
-      style={{
-        opacity: isDragging ? 0.5 : 1,
-        cursor: 'move',
-        width: '60px',
-        height: '60px',
-        margin: '5px',
-        display: 'inline-block',
-        backgroundColor: isOver && dropCanDrop ? 'rgba(0, 255, 0, 0.1)' : 'transparent', 
-        borderRadius: '4px',
-      }}
+      isDragging={isDragging}
+      isOver={isOver}
+      canDrop={dropCanDrop}
     >
-      <img
+      <PokemonImage
         src={pokemon.imageUrl}
         alt={pokemon.name}
         title={pokemon.name}
-        style={{ width: '100%', height: '100%', objectFit: 'contain' }}
       />
-    </div>
+    </PokemonContainer>
   );
 };
 
-export default DraggablePokemon;
+// React.memoでコンポーネントをメモ化し、不要な再レンダリングを防止
+export default memo(DraggablePokemon);

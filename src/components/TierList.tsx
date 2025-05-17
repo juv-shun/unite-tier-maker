@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { Pokemon, pokemonList } from '../data/pokemon';
@@ -7,6 +7,15 @@ import DraggablePokemon from './DraggablePokemon';
 import { useTierManagement } from '../hooks/useTierManagement';
 import { TIERS } from '../constants/tiers';
 import { PokemonAssignment, TierId } from '../types';
+import {
+  TierListContainer,
+  TierListHeader,
+  TierListContent,
+  UnassignedContainer,
+  UnassignedGrid,
+  ButtonContainer,
+  ResetButton
+} from '../styles/TierList.styles';
 
 const TierList: React.FC = () => {
   const {
@@ -15,37 +24,42 @@ const TierList: React.FC = () => {
     handleResetTiers,
   } = useTierManagement();
 
-  const unassignedPokemon = getPokemonsByLocation(TierId.UNASSIGNED);
+  // useMemoを使用してフィルタリングされたポケモンをキャッシュ
+  const unassignedPokemon = useMemo(() => 
+    getPokemonsByLocation(TierId.UNASSIGNED),
+    [getPokemonsByLocation]
+  );
+
+  // 各Tier用のポケモンリストをキャッシュ
+  const tierPokemonMap = useMemo(() => 
+    TIERS.reduce((acc, tier) => {
+      acc[tier.id] = getPokemonsByLocation(tier.id);
+      return acc;
+    }, {} as Record<string, Pokemon[]>),
+    [getPokemonsByLocation]
+  );
 
   return (
     <DndProvider backend={HTML5Backend}>
-      <div className="tier-list-container" style={{ maxWidth: '800px', margin: '0 auto' }}>
-        <div className="tier-list-header" style={{ margin: '20px 0', textAlign: 'center' }}>
+      <TierListContainer>
+        <TierListHeader>
           <h1>ポケモンユナイト Tierリスト</h1>
-        </div>
+        </TierListHeader>
         
-        <div className="tier-list">
+        <TierListContent>
           {TIERS.map((tier) => (
             <TierRow
               key={tier.id}
               tier={tier.id}
               color={tier.color}
-              pokemon={getPokemonsByLocation(tier.id)}
+              pokemon={tierPokemonMap[tier.id]}
               onMovePokemon={handleMovePokemon}
             />
           ))}
-        </div>
+        </TierListContent>
         
-        <div 
-          className="unassigned-pokemon"
-          style={{ 
-            marginTop: '30px',
-            padding: '15px', 
-            backgroundColor: '#f5f5f5',
-            borderRadius: '5px'
-          }}
-        >
-          <div style={{ display: 'flex', flexWrap: 'wrap' }}>
+        <UnassignedContainer>
+          <UnassignedGrid>
             {unassignedPokemon.map((pokemon, index) => (
               <DraggablePokemon 
                 key={pokemon.id} 
@@ -55,25 +69,15 @@ const TierList: React.FC = () => {
                 onMove={handleMovePokemon}
               />
             ))}
-          </div>
-        </div>
+          </UnassignedGrid>
+        </UnassignedContainer>
         
-        <div style={{ textAlign: 'center', marginTop: '20px' }}>
-          <button 
-            onClick={handleResetTiers}
-            style={{
-              padding: '10px 15px',
-              backgroundColor: '#f44336',
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: 'pointer',
-            }}
-          >
+        <ButtonContainer>
+          <ResetButton onClick={handleResetTiers}>
             リセット
-          </button>
-        </div>
-      </div>
+          </ResetButton>
+        </ButtonContainer>
+      </TierListContainer>
     </DndProvider>
   );
 };
