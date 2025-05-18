@@ -18,7 +18,7 @@ export enum TierId {
   A = 'A',
   B = 'B',
   C = 'C',
-  D = 'D',
+  // D値を削除
   UNASSIGNED = 'unassigned'
 }
 
@@ -27,6 +27,7 @@ export enum TierId {
  */
 export interface DragItem {
   id: string;
+  assignmentId?: string; // 追加: アサインメントのID
   originalIndex: number;
   originalTierLocation: string;
 }
@@ -35,9 +36,11 @@ export interface DragItem {
  * ポケモン配置情報の型定義
  */
 export interface PokemonAssignment {
+  id: string; // 追加: 各配置に固有のID
   pokemonId: string;
   location: string; // TierId単体、または '{Position}-{TierId}' の形式、あるいは 'unassigned'
   position: number; // そのロケーション内での位置（順序）
+  isFromUnassignedArea: boolean; // 追加: 未配置エリアからのものかどうか
 }
 
 /**

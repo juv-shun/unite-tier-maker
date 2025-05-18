@@ -116,7 +116,14 @@ const TierList: React.FC = () => {
                 pokemon={pokemon}
                 tierLocation={TierId.UNASSIGNED}
                 index={index}
-                onMove={handleMovePokemon}
+                onMove={(draggedItemInfo, targetTierLocation, targetIndexInTier, isDroppedOutside) => {
+                  handleMovePokemon(
+                    draggedItemInfo,
+                    targetTierLocation,
+                    targetIndexInTier,
+                    isDroppedOutside
+                  );
+                }}
               />
             ))}
           </UnassignedGrid>

@@ -5,12 +5,20 @@ import { TIERS } from '../constants/tiers';
 
 // 型定義とTIERSは types と constants に移動しました
 
+// 配置ID用のユニークIDを生成する関数
+const generateAssignmentId = (): string => {
+  return `assignment-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+};
+
 export const useTierManagement = () => {
+  // assignmentIdを追加して、同じポケモンが複数の場所に配置できるようにする
   const [assignments, setAssignments] = useState<PokemonAssignment[]>(
     pokemonList.map((pokemon, index) => ({
+      id: generateAssignmentId(),
       pokemonId: pokemon.id,
       location: TierId.UNASSIGNED, // 初期状態ではunassigned
-      position: index
+      position: index,
+      isFromUnassignedArea: true // 未配置エリアから来たポケモンかどうかのフラグ
     }))
   );
 
@@ -19,77 +27,143 @@ export const useTierManagement = () => {
   }, []);
 
   const getPokemonsByLocation = useCallback((location: string): Pokemon[] => {
-    return assignments
+    const filtered = assignments
       .filter(assignment => assignment.location === location)
-      .sort((a, b) => a.position - b.position)
-      .map(assignment => {
-        const pokemon = getPokemonById(assignment.pokemonId);
-        if (!pokemon) return null;
-        return pokemon;
-      })
-      .filter((pokemon): pokemon is Pokemon => pokemon !== null);
-  }, [assignments, getPokemonById]);
+      .sort((a, b) => a.position - b.position);
 
-  const handleMovePokemon = useCallback((
-    draggedPokemonId: string,
-    targetTierLocation: string,
-    targetIndexInTier: number | undefined
-  ) => {
-    setAssignments(prevAssignments => {
-      const assignmentsCopy = prevAssignments.map(a => ({ ...a }));
-      const draggedPokemonAssignment = assignmentsCopy.find(a => a.pokemonId === draggedPokemonId);
-      if (!draggedPokemonAssignment) return prevAssignments;
+    // 未配置エリアは同じポケモンが複数表示されないように重複排除
+    const seen = new Set<string>();
 
-      // ドラッグしたポケモンを除くすべての配置情報
-      const filteredAssignments = assignmentsCopy.filter(a => a.pokemonId !== draggedPokemonId);
+    const result: (Pokemon & { assignmentId: string; isFromUnassignedArea: boolean })[] = [];
 
-      // 各ロケーションごとの配置情報を展開
-      const newTiersState: Record<string, PokemonAssignment[]> = {};
-      
-      // すべてのロケーションキーを生成
-      // アサイメントから現在使用中のすべてのロケーションキーを取得
-      const locationKeysSet = new Set<string>();
-      locationKeysSet.add(TierId.UNASSIGNED);
-
-      // 現在のアサイメントから使用中のロケーションキーを追加
-      assignmentsCopy.forEach(a => {
-        locationKeysSet.add(a.location);
-      });
-      
-      // 新しいターゲットロケーションも追加
-      locationKeysSet.add(targetTierLocation);
-      
-      // Setを配列に変換
-      const locationKeys = Array.from(locationKeysSet);
-
-      // 各ロケーションごとに配置情報をフィルタリングして保持
-      locationKeys.forEach(locationKey => {
-        newTiersState[locationKey] = filteredAssignments
-          .filter(a => a.location === locationKey)
-          .sort((a, b) => a.position - b.position);
-      });
-
-      // ドラッグしたポケモンの配置先を更新
-      // targetTierLocationは文字列型(ポジションとTierの組み合わせや単純なTierIdやunassignedなど)
-      draggedPokemonAssignment.location = targetTierLocation as string;
-      
-      // ターゲット位置に挿入または最後に追加
-      if (targetIndexInTier !== undefined) {
-        newTiersState[targetTierLocation].splice(targetIndexInTier, 0, draggedPokemonAssignment);
-      } else {
-        newTiersState[targetTierLocation].push(draggedPokemonAssignment);
+    filtered.forEach(assignment => {
+      if (location === TierId.UNASSIGNED) {
+        if (seen.has(assignment.pokemonId)) {
+          return; // skip duplicates
+        }
+        seen.add(assignment.pokemonId);
       }
 
-      // すべての配置情報を再構成し、各ロケーション内での位置を更新
-      const finalAssignments: PokemonAssignment[] = [];
-      locationKeys.forEach(locationKey => {
-        newTiersState[locationKey].forEach((assignment, index) => {
-          assignment.position = index;
-          finalAssignments.push(assignment);
-        });
+      const pokemon = getPokemonById(assignment.pokemonId);
+      if (!pokemon) return;
+
+      result.push({
+        ...pokemon,
+        assignmentId: assignment.id,
+        isFromUnassignedArea: assignment.isFromUnassignedArea,
       });
+    });
+
+    return result;
+  }, [assignments, getPokemonById]);
+
+  // ドラッグアンドドロップの引数をポケモンIDからアサインメントIDに変更し、外部へのドロップフラグを追加
+  const handleMovePokemon = useCallback((draggedItemInfo: { pokemonId: string; assignmentId?: string }, targetTierLocation: string, targetIndexInTier: number | undefined, isDroppedOutside: boolean = false) => {
+    setAssignments(prevAssignments => {
+      let assignmentsCopy = prevAssignments.map(a => ({ ...a }));
       
-      return finalAssignments;
+      // エリア外にドロップされた場合の処理
+      if (isDroppedOutside && draggedItemInfo.assignmentId) {
+        // ドロップされたアサインメントIDを持つアサインメントを削除
+        return assignmentsCopy.filter(a => a.id !== draggedItemInfo.assignmentId);
+      }
+      
+      // ドラッグされた要素を探す
+      const draggedPokemonAssignment = draggedItemInfo.assignmentId ?
+        assignmentsCopy.find(a => a.id === draggedItemInfo.assignmentId) :
+        assignmentsCopy.find(a => a.pokemonId === draggedItemInfo.pokemonId && a.location === TierId.UNASSIGNED);
+        
+      if (!draggedPokemonAssignment) return prevAssignments;
+      
+      // 未配置エリアからのドラッグの場合は新しいアサインメントを作成
+      if (draggedPokemonAssignment.location === TierId.UNASSIGNED && !draggedItemInfo.assignmentId) {
+        // 新しいアサインメントを作成
+        const newAssignment: PokemonAssignment = {
+          id: generateAssignmentId(),
+          pokemonId: draggedPokemonAssignment.pokemonId,
+          location: targetTierLocation,
+          position: 0, // 位置は後で再計算
+          isFromUnassignedArea: false // Tierに配置されるので、未配置エリアからではなくなる
+        };
+        
+        // 各ロケーションごとの配置情報を得るために既存のアサインメントをフィルタリング
+        const locationGroupedAssignments: Record<string, PokemonAssignment[]> = {};
+        
+        // すべてのロケーションキーを含むSetを作成
+        const locationKeysSet = new Set<string>();
+        locationKeysSet.add(targetTierLocation);
+        
+        // 現在のアサインメントから使用中のロケーションキーを追加
+        assignmentsCopy.forEach(a => {
+          locationKeysSet.add(a.location);
+        });
+        
+        // 各ロケーションごとにアサインメントをグループ化
+        Array.from(locationKeysSet).forEach(locationKey => {
+          locationGroupedAssignments[locationKey] = assignmentsCopy
+            .filter(a => a.location === locationKey)
+            .sort((a, b) => a.position - b.position);
+        });
+        
+        // 新しいアサインメントを対象のロケーションに追加
+        if (targetIndexInTier !== undefined) {
+          locationGroupedAssignments[targetTierLocation].splice(targetIndexInTier, 0, newAssignment);
+        } else {
+          locationGroupedAssignments[targetTierLocation].push(newAssignment);
+        }
+        
+        // 位置情報を更新して最終的なアサインメントリストを作成
+        const finalAssignments: PokemonAssignment[] = [];
+        Object.entries(locationGroupedAssignments).forEach(([locationKey, assignments]) => {
+          assignments.forEach((assignment, index) => {
+            assignment.position = index;
+            finalAssignments.push(assignment);
+          });
+        });
+        
+        return finalAssignments;
+      } else {
+        // Tier内でのドラッグ&ドロップの場合、アサインメントの場所を更新
+        draggedPokemonAssignment.location = targetTierLocation;
+        
+        // 各ロケーションごとの配置情報を得るために既存のアサインメントをフィルタリング（ドラッグしているアイテムを除く）
+        const filteredAssignments = assignmentsCopy.filter(a => a.id !== draggedPokemonAssignment.id);
+        const locationGroupedAssignments: Record<string, PokemonAssignment[]> = {};
+        
+        // すべてのロケーションキーを含むSetを作成
+        const locationKeysSet = new Set<string>();
+        locationKeysSet.add(targetTierLocation);
+        
+        // 現在のアサインメントから使用中のロケーションキーを追加
+        filteredAssignments.forEach(a => {
+          locationKeysSet.add(a.location);
+        });
+        
+        // 各ロケーションごとにアサインメントをグループ化
+        Array.from(locationKeysSet).forEach(locationKey => {
+          locationGroupedAssignments[locationKey] = filteredAssignments
+            .filter(a => a.location === locationKey)
+            .sort((a, b) => a.position - b.position);
+        });
+        
+        // ドラッグしているアイテムを適切な位置に挿入
+        if (targetIndexInTier !== undefined) {
+          locationGroupedAssignments[targetTierLocation].splice(targetIndexInTier, 0, draggedPokemonAssignment);
+        } else {
+          locationGroupedAssignments[targetTierLocation].push(draggedPokemonAssignment);
+        }
+        
+        // 位置情報を更新して最終的なアサインメントリストを作成
+        const finalAssignments: PokemonAssignment[] = [];
+        Object.entries(locationGroupedAssignments).forEach(([locationKey, assignments]) => {
+          assignments.forEach((assignment, index) => {
+            assignment.position = index;
+            finalAssignments.push(assignment);
+          });
+        });
+        
+        return finalAssignments;
+      }
     });
   }, []);
 
@@ -97,9 +171,11 @@ export const useTierManagement = () => {
   const handleResetTiers = useCallback(() => {
     setAssignments(
       pokemonList.map((pokemon, index) => ({
+        id: generateAssignmentId(),
         pokemonId: pokemon.id,
         location: TierId.UNASSIGNED,
-        position: index
+        position: index,
+        isFromUnassignedArea: true
       }))
     );
   }, []);

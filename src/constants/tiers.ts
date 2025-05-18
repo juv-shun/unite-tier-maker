@@ -9,5 +9,5 @@ export const TIERS = [
   { id: TierId.A, color: '#FFBF7F' }, // オレンジ
   { id: TierId.B, color: '#FFFF7F' }, // 黄色
   { id: TierId.C, color: '#7FFF7F' }, // 緑
-  { id: TierId.D, color: '#7FBFFF' }, // 青
+  // D列を削除
 ];

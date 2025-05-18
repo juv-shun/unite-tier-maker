@@ -1,14 +1,14 @@
 import React, { useRef, memo } from 'react';
 import { useDrag, useDrop, XYCoord } from 'react-dnd'; 
 import { Pokemon } from '../data/pokemon';
-import { DragItem, DND_ITEM_TYPE } from '../types';
+import { DragItem, DND_ITEM_TYPE, TierId } from '../types';
 import { PokemonContainer, PokemonImage } from '../styles/DraggablePokemon.styles';
 
 interface DraggablePokemonProps {
-  pokemon: Pokemon;
+  pokemon: Pokemon & { assignmentId?: string; isFromUnassignedArea?: boolean };
   index: number;  
   tierLocation: string;  
-  onMove: (draggedPokemonId: string, targetTierLocation: string, targetIndexInTier: number | undefined) => void;
+  onMove: (draggedItemInfo: { pokemonId: string; assignmentId?: string }, targetTierLocation: string, targetIndexInTier: number | undefined, isDroppedOutside?: boolean) => void;
 }
 
 const DraggablePokemon: React.FC<DraggablePokemonProps> = ({ pokemon, index, tierLocation, onMove }) => {
@@ -21,13 +21,22 @@ const DraggablePokemon: React.FC<DraggablePokemonProps> = ({ pokemon, index, tie
   >(
     () => ({
       type: DND_ITEM_TYPE, 
-      item: { id: pokemon.id, originalIndex: index, originalTierLocation: tierLocation },
+      item: { 
+        id: pokemon.id, 
+        assignmentId: tierLocation === TierId.UNASSIGNED ? undefined : pokemon.assignmentId, // 下部からはundefinedでコピー扱い
+        originalIndex: index, 
+        originalTierLocation: tierLocation 
+      },
       collect: (monitor) => ({
         isDragging: !!monitor.isDragging(),
       }),
       end: (item, monitor) => {
-        // ドロップが失敗した場合は何もしない
-        if (!monitor.didDrop()) return;
+        // ドロップが失敗した場合（ドロップ可能なエリア外にドロップした場合）、エリアから削除
+        if (!monitor.didDrop() && item.assignmentId && tierLocation !== TierId.UNASSIGNED) {
+          // エリア外にドロップされた場合、trueを設定して削除処理を実行
+          onMove({ pokemonId: item.id, assignmentId: item.assignmentId }, '', undefined, true);
+          return;
+        }
       },
     }),
     [pokemon, index, tierLocation, onMove]
@@ -42,16 +51,18 @@ const DraggablePokemon: React.FC<DraggablePokemonProps> = ({ pokemon, index, tie
       accept: DND_ITEM_TYPE,
       hover: (draggedItem: DragItem, monitor) => { 
         if (!ref.current) return;
-        if (draggedItem.id === pokemon.id) return;
+        if (draggedItem.id === pokemon.id && draggedItem.assignmentId === pokemon.assignmentId) return;
 
         const hoverIndex = index;
-        onMove(draggedItem.id, tierLocation, hoverIndex);
+        // アサインメントIDを含む呼び出しに変更
+        onMove({ pokemonId: draggedItem.id, assignmentId: draggedItem.assignmentId }, tierLocation, hoverIndex, false);
 
         draggedItem.originalIndex = hoverIndex;
         draggedItem.originalTierLocation = tierLocation;
       },
       canDrop: (draggedItem: DragItem) => { 
-        return draggedItem.id !== pokemon.id;
+        // 同じポケモンでもアサインメントIDが異なれば許可（複数配置のため）
+        return !(draggedItem.id === pokemon.id && draggedItem.assignmentId === pokemon.assignmentId);
       },
       collect: (monitor) => ({
         isOver: !!monitor.isOver() && monitor.canDrop(),
