@@ -1,26 +1,26 @@
 import React, { useMemo } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
-import { Pokemon, pokemonList, Position, POSITIONS } from '../data/pokemon';
-import TierRow from './TierRow';
-import DraggablePokemon from './DraggablePokemon';
-import { useTierManagement } from '../hooks/useTierManagement';
 import { TIERS } from '../constants/tiers';
-import { PokemonAssignment, TierId } from '../types';
+import { Pokemon, Position, POSITIONS } from '../data/pokemon';
+import { useTierManagement } from '../hooks/useTierManagement';
 import {
-  TierListContainer,
-  TierListHeader,
-  TierListContent,
-  UnassignedContainer,
-  UnassignedGrid,
   ButtonContainer,
-  ResetButton,
+  EmptyTierLabel,
   PositionColumn,
   PositionHeader,
-  TierLabelsColumn,
+  ResetButton,
   TierLabelOnly,
-  EmptyTierLabel
+  TierLabelsColumn,
+  TierListContainer,
+  TierListContent,
+  TierListHeader,
+  UnassignedContainer,
+  UnassignedGrid
 } from '../styles/TierList.styles';
+import { TierId } from '../types';
+import DraggablePokemon from './DraggablePokemon';
+import TierRow from './TierRow';
 
 const TierList: React.FC = () => {
   const {
@@ -30,7 +30,7 @@ const TierList: React.FC = () => {
   } = useTierManagement();
 
   // useMemoを使用してフィルタリングされたポケモンをキャッシュ
-  const unassignedPokemon = useMemo(() => 
+  const unassignedPokemon = useMemo(() =>
     getPokemonsByLocation(TierId.UNASSIGNED),
     [getPokemonsByLocation]
   );
@@ -40,11 +40,11 @@ const TierList: React.FC = () => {
   const positionTierPokemonMap = useMemo(() => {
     // ポジションごとのマップを作成
     const posMap: Record<Position, Record<string, Pokemon[]>> = {} as Record<Position, Record<string, Pokemon[]>>;
-    
+
     // 各ポジションを初期化
     POSITIONS.forEach(position => {
       posMap[position.id] = {};
-      
+
       // 各ポジション列に各Tierのポケモンリストを作成
       TIERS.forEach(tier => {
         // ポジションでのフィルタリングを行わない
@@ -53,10 +53,10 @@ const TierList: React.FC = () => {
         posMap[position.id][tier.id] = getPokemonsByLocation(tierLocationKey);
       });
     });
-    
+
     return posMap;
   }, [getPokemonsByLocation]);
-  
+
   // 未配置ポケモンはポジションで分けずに共通で使用
 
   // ポジションごとの背景色を定義
@@ -74,7 +74,7 @@ const TierList: React.FC = () => {
         <TierListHeader>
           <h1>ポケモンユナイト Tierリスト</h1>
         </TierListHeader>
-        
+
         <TierListContent>
           {/* Tierラベルを左側に1列だけ表示 */}
           <TierLabelsColumn>
@@ -85,14 +85,14 @@ const TierList: React.FC = () => {
               </TierLabelOnly>
             ))}
           </TierLabelsColumn>
-          
+
           {/* 各ポジションの列 */}
           {POSITIONS.map(position => (
             <PositionColumn key={position.id}>
               <PositionHeader backgroundColor={positionColors[position.id]}>
                 {position.name}
               </PositionHeader>
-              
+
               {TIERS.map(tier => (
                 <TierRow
                   key={`${position.id}-${tier.id}`}
@@ -107,22 +107,21 @@ const TierList: React.FC = () => {
             </PositionColumn>
           ))}
         </TierListContent>
-        
+
         <UnassignedContainer>
-          <h3>ポケモン一覧</h3>
           <UnassignedGrid>
             {unassignedPokemon.map((pokemon, index) => (
-              <DraggablePokemon 
-                key={pokemon.id} 
-                pokemon={pokemon} 
+              <DraggablePokemon
+                key={pokemon.id}
+                pokemon={pokemon}
                 tierLocation={TierId.UNASSIGNED}
-                index={index} 
+                index={index}
                 onMove={handleMovePokemon}
               />
             ))}
           </UnassignedGrid>
         </UnassignedContainer>
-        
+
         <ButtonContainer>
           <ResetButton onClick={handleResetTiers}>
             リセット
