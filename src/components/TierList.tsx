@@ -16,7 +16,10 @@ import {
   ButtonContainer,
   ResetButton,
   PositionColumn,
-  PositionHeader
+  PositionHeader,
+  TierLabelsColumn,
+  TierLabelOnly,
+  EmptyTierLabel
 } from '../styles/TierList.styles';
 
 const TierList: React.FC = () => {
@@ -73,6 +76,17 @@ const TierList: React.FC = () => {
         </TierListHeader>
         
         <TierListContent>
+          {/* Tierラベルを左側に1列だけ表示 */}
+          <TierLabelsColumn>
+            <EmptyTierLabel />
+            {TIERS.map(tier => (
+              <TierLabelOnly key={tier.id} backgroundColor={tier.color}>
+                {tier.id}
+              </TierLabelOnly>
+            ))}
+          </TierLabelsColumn>
+          
+          {/* 各ポジションの列 */}
           {POSITIONS.map(position => (
             <PositionColumn key={position.id}>
               <PositionHeader backgroundColor={positionColors[position.id]}>
@@ -87,6 +101,7 @@ const TierList: React.FC = () => {
                   pokemon={positionTierPokemonMap[position.id][tier.id]}
                   onMovePokemon={handleMovePokemon}
                   positionId={position.id}
+                  hideLabel={true} /* ラベルを非表示にする */
                 />
               ))}
             </PositionColumn>

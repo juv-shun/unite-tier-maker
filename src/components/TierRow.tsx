@@ -11,9 +11,10 @@ interface TierRowProps {
   pokemon: Pokemon[];
   onMovePokemon: (draggedPokemonId: string, targetTierLocation: string, targetIndexInTier: number | undefined) => void;
   positionId?: string; // ポジションIDを追加（オプショナル）
+  hideLabel?: boolean; // Tierラベルを非表示にするかどうか（オプショナル）
 }
 
-const TierRow: React.FC<TierRowProps> = ({ tier, color, pokemon, onMovePokemon, positionId }) => {
+const TierRow: React.FC<TierRowProps> = ({ tier, color, pokemon, onMovePokemon, positionId, hideLabel = false }) => {
   // ポジションとTierを組み合わせたロケーションキーを生成
   const locationKey = positionId ? `${positionId}-${tier}` : tier;
   const ref = useRef<HTMLDivElement>(null);
@@ -44,9 +45,11 @@ const TierRow: React.FC<TierRowProps> = ({ tier, color, pokemon, onMovePokemon, 
 
   return (
     <TierRowContainer>
-      <TierLabel backgroundColor={color}>
-        {tier}
-      </TierLabel>
+      {!hideLabel && (
+        <TierLabel backgroundColor={color}>
+          {tier}
+        </TierLabel>
+      )}
       <TierContent ref={ref} isOver={isOver}>
         {pokemon.map((p, index) => (
           <DraggablePokemon 
