@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { Pokemon, pokemonList } from '../data/pokemon';
+import { Pokemon, pokemonList, Position, POSITIONS } from '../data/pokemon';
 import { PokemonAssignment, TierId } from '../types';
 import { TIERS } from '../constants/tiers';
 
@@ -9,7 +9,7 @@ export const useTierManagement = () => {
   const [assignments, setAssignments] = useState<PokemonAssignment[]>(
     pokemonList.map((pokemon, index) => ({
       pokemonId: pokemon.id,
-      location: TierId.UNASSIGNED,
+      location: TierId.UNASSIGNED, // 初期状態ではunassigned
       position: index
     }))
   );
@@ -40,35 +40,60 @@ export const useTierManagement = () => {
       const draggedPokemonAssignment = assignmentsCopy.find(a => a.pokemonId === draggedPokemonId);
       if (!draggedPokemonAssignment) return prevAssignments;
 
+      // ドラッグしたポケモンを除くすべての配置情報
       const filteredAssignments = assignmentsCopy.filter(a => a.pokemonId !== draggedPokemonId);
 
+      // 各ロケーションごとの配置情報を展開
       const newTiersState: Record<string, PokemonAssignment[]> = {};
-      const allTierIds = [...TIERS.map(t => t.id), 'unassigned'];
+      
+      // すべてのロケーションキーを生成
+      // アサイメントから現在使用中のすべてのロケーションキーを取得
+      const locationKeysSet = new Set<string>();
+      locationKeysSet.add(TierId.UNASSIGNED);
 
-      allTierIds.forEach(tierId => {
-        newTiersState[tierId] = filteredAssignments
-          .filter(a => a.location === tierId)
+      // 現在のアサイメントから使用中のロケーションキーを追加
+      assignmentsCopy.forEach(a => {
+        locationKeysSet.add(a.location);
+      });
+      
+      // 新しいターゲットロケーションも追加
+      locationKeysSet.add(targetTierLocation);
+      
+      // Setを配列に変換
+      const locationKeys = Array.from(locationKeysSet);
+
+      // 各ロケーションごとに配置情報をフィルタリングして保持
+      locationKeys.forEach(locationKey => {
+        newTiersState[locationKey] = filteredAssignments
+          .filter(a => a.location === locationKey)
           .sort((a, b) => a.position - b.position);
       });
 
-      draggedPokemonAssignment.location = targetTierLocation;
+      // ドラッグしたポケモンの配置先を更新
+      // targetTierLocationは文字列型(ポジションとTierの組み合わせや単純なTierIdやunassignedなど)
+      draggedPokemonAssignment.location = targetTierLocation as string;
+      
+      // ターゲット位置に挿入または最後に追加
       if (targetIndexInTier !== undefined) {
         newTiersState[targetTierLocation].splice(targetIndexInTier, 0, draggedPokemonAssignment);
       } else {
         newTiersState[targetTierLocation].push(draggedPokemonAssignment);
       }
 
+      // すべての配置情報を再構成し、各ロケーション内での位置を更新
       const finalAssignments: PokemonAssignment[] = [];
-      allTierIds.forEach(tierId => {
-        newTiersState[tierId].forEach((pokemon, index) => {
-          pokemon.position = index;
-          finalAssignments.push(pokemon);
+      locationKeys.forEach(locationKey => {
+        newTiersState[locationKey].forEach((assignment, index) => {
+          assignment.position = index;
+          finalAssignments.push(assignment);
         });
       });
+      
       return finalAssignments;
     });
   }, []);
 
+  // すべてのポケモンを未配置状態にリセット
   const handleResetTiers = useCallback(() => {
     setAssignments(
       pokemonList.map((pokemon, index) => ({

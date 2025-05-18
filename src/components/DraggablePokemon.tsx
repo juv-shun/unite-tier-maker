@@ -25,6 +25,10 @@ const DraggablePokemon: React.FC<DraggablePokemonProps> = ({ pokemon, index, tie
       collect: (monitor) => ({
         isDragging: !!monitor.isDragging(),
       }),
+      end: (item, monitor) => {
+        // ドロップが失敗した場合は何もしない
+        if (!monitor.didDrop()) return;
+      },
     }),
     [pokemon, index, tierLocation, onMove]
   );

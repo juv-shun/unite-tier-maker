@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
-import { Pokemon, pokemonList } from '../data/pokemon';
+import { Pokemon, pokemonList, Position, POSITIONS } from '../data/pokemon';
 import TierRow from './TierRow';
 import DraggablePokemon from './DraggablePokemon';
 import { useTierManagement } from '../hooks/useTierManagement';
@@ -14,7 +14,9 @@ import {
   UnassignedContainer,
   UnassignedGrid,
   ButtonContainer,
-  ResetButton
+  ResetButton,
+  PositionColumn,
+  PositionHeader
 } from '../styles/TierList.styles';
 
 const TierList: React.FC = () => {
@@ -30,14 +32,38 @@ const TierList: React.FC = () => {
     [getPokemonsByLocation]
   );
 
-  // 各Tier用のポケモンリストをキャッシュ
-  const tierPokemonMap = useMemo(() => 
-    TIERS.reduce((acc, tier) => {
-      acc[tier.id] = getPokemonsByLocation(tier.id);
-      return acc;
-    }, {} as Record<string, Pokemon[]>),
-    [getPokemonsByLocation]
-  );
+  // 各ポジションで各Tier用のポケモンリストをキャッシュ
+  // ポケモンのポジションでフィルタリングしないようにして、どのポケモンもどのポジションにも配置可能にする
+  const positionTierPokemonMap = useMemo(() => {
+    // ポジションごとのマップを作成
+    const posMap: Record<Position, Record<string, Pokemon[]>> = {} as Record<Position, Record<string, Pokemon[]>>;
+    
+    // 各ポジションを初期化
+    POSITIONS.forEach(position => {
+      posMap[position.id] = {};
+      
+      // 各ポジション列に各Tierのポケモンリストを作成
+      TIERS.forEach(tier => {
+        // ポジションでのフィルタリングを行わない
+        // 代わりに、ポジションとTierの組み合わせに対して配置されたポケモンを取得
+        const tierLocationKey = `${position.id}-${tier.id}`;
+        posMap[position.id][tier.id] = getPokemonsByLocation(tierLocationKey);
+      });
+    });
+    
+    return posMap;
+  }, [getPokemonsByLocation]);
+  
+  // 未配置ポケモンはポジションで分けずに共通で使用
+
+  // ポジションごとの背景色を定義
+  const positionColors = {
+    [Position.ATTACKER]: '#FF7F7F', // 赤
+    [Position.SPEEDSTER]: '#FFBF7F', // オレンジ
+    [Position.ALL_ROUNDER]: '#FFDF7F', // 黄色っぽいオレンジ
+    [Position.DEFENDER]: '#7FFF7F', // 緑
+    [Position.SUPPORTER]: '#7FBFFF', // 青
+  };
 
   return (
     <DndProvider backend={HTML5Backend}>
@@ -47,18 +73,28 @@ const TierList: React.FC = () => {
         </TierListHeader>
         
         <TierListContent>
-          {TIERS.map((tier) => (
-            <TierRow
-              key={tier.id}
-              tier={tier.id}
-              color={tier.color}
-              pokemon={tierPokemonMap[tier.id]}
-              onMovePokemon={handleMovePokemon}
-            />
+          {POSITIONS.map(position => (
+            <PositionColumn key={position.id}>
+              <PositionHeader backgroundColor={positionColors[position.id]}>
+                {position.name}
+              </PositionHeader>
+              
+              {TIERS.map(tier => (
+                <TierRow
+                  key={`${position.id}-${tier.id}`}
+                  tier={tier.id}
+                  color={tier.color}
+                  pokemon={positionTierPokemonMap[position.id][tier.id]}
+                  onMovePokemon={handleMovePokemon}
+                  positionId={position.id}
+                />
+              ))}
+            </PositionColumn>
           ))}
         </TierListContent>
         
         <UnassignedContainer>
+          <h3>ポケモン一覧</h3>
           <UnassignedGrid>
             {unassignedPokemon.map((pokemon, index) => (
               <DraggablePokemon 

@@ -1,3 +1,5 @@
+import { Position } from '../data/pokemon';
+
 /**
  * ポケモンデータの型定義
  */
@@ -5,6 +7,7 @@ export interface Pokemon {
   id: string;
   name: string;
   imageUrl: string;
+  position: Position;
 }
 
 /**
@@ -33,8 +36,8 @@ export interface DragItem {
  */
 export interface PokemonAssignment {
   pokemonId: string;
-  location: string; // TierId または 'unassigned'
-  position: number; // Tier内での位置（順序）
+  location: string; // TierId単体、または '{Position}-{TierId}' の形式、あるいは 'unassigned'
+  position: number; // そのロケーション内での位置（順序）
 }
 
 /**

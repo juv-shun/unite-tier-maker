@@ -10,9 +10,12 @@ interface TierRowProps {
   color: string;
   pokemon: Pokemon[];
   onMovePokemon: (draggedPokemonId: string, targetTierLocation: string, targetIndexInTier: number | undefined) => void;
+  positionId?: string; // ポジションIDを追加（オプショナル）
 }
 
-const TierRow: React.FC<TierRowProps> = ({ tier, color, pokemon, onMovePokemon }) => {
+const TierRow: React.FC<TierRowProps> = ({ tier, color, pokemon, onMovePokemon, positionId }) => {
+  // ポジションとTierを組み合わせたロケーションキーを生成
+  const locationKey = positionId ? `${positionId}-${tier}` : tier;
   const ref = useRef<HTMLDivElement>(null);
   
   const [{ isOver }, connectDrop] = useDrop<
@@ -24,8 +27,8 @@ const TierRow: React.FC<TierRowProps> = ({ tier, color, pokemon, onMovePokemon }
     drop: (item: DragItem) => {
       // TierRowの空きスペースにドロップされた場合
       // ドラッグ元のTierとドロップ先のTierが異なる場合に、このTierの末尾に追加
-      if (item.originalTierLocation !== tier) {
-        onMovePokemon(item.id, tier, undefined); 
+      if (item.originalTierLocation !== locationKey) {
+        onMovePokemon(item.id, locationKey, undefined); 
       }
       // 同じTier内での移動で、Tierの空きスペースにドロップされた場合の処理は、
       // DraggablePokemonのhoverによる並び替えに任せるか、ここで明示的に末尾に追加するか検討の余地あり。
@@ -50,7 +53,7 @@ const TierRow: React.FC<TierRowProps> = ({ tier, color, pokemon, onMovePokemon }
             key={p.id} 
             pokemon={p} 
             index={index} 
-            tierLocation={tier} 
+            tierLocation={locationKey} 
             onMove={onMovePokemon}
           />
         ))}

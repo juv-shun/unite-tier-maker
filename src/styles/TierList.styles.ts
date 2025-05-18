@@ -1,5 +1,6 @@
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
+import { Position } from '../data/pokemon';
 
 /**
  * TierListコンポーネントのスタイル
@@ -45,7 +46,7 @@ export const tierListStyles = {
 
 // スタイル付きコンポーネント
 export const TierListContainer = styled.div`
-  max-width: 800px;
+  max-width: 1200px;
   margin: 0 auto;
 `;
 
@@ -56,6 +57,25 @@ export const TierListHeader = styled.div`
 
 export const TierListContent = styled.div`
   margin-bottom: 20px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 10px;
+`;
+
+export const PositionColumn = styled.div`
+  flex: 1;
+  min-width: 0;
+`;
+
+export const PositionHeader = styled.div<{ backgroundColor: string }>`
+  padding: 8px;
+  text-align: center;
+  background-color: ${props => props.backgroundColor};
+  color: white;
+  font-weight: bold;
+  border-radius: 4px 4px 0 0;
+  margin-bottom: 10px;
 `;
 
 export const UnassignedContainer = styled.div`
