@@ -35,26 +35,26 @@ const TierList: React.FC = () => {
     [getPokemonsByLocation]
   );
 
-  // 各ポジションで各Tier用のポケモンリストをキャッシュ
+  // 各Tierで各ポジション用のポケモンリストをキャッシュ
   // ポケモンのポジションでフィルタリングしないようにして、どのポケモンもどのポジションにも配置可能にする
-  const positionTierPokemonMap = useMemo(() => {
-    // ポジションごとのマップを作成
-    const posMap: Record<Position, Record<string, Pokemon[]>> = {} as Record<Position, Record<string, Pokemon[]>>;
+  const tierPositionPokemonMap = useMemo(() => {
+    // Tierごとのマップを作成（行列を入れ替え）
+    const tierMap: Record<string, Record<Position, Pokemon[]>> = {} as Record<string, Record<Position, Pokemon[]>>;
 
-    // 各ポジションを初期化
-    POSITIONS.forEach(position => {
-      posMap[position.id] = {};
+    // 各Tierを初期化
+    TIERS.forEach(tier => {
+      tierMap[tier.id] = {} as Record<Position, Pokemon[]>;
 
-      // 各ポジション列に各Tierのポケモンリストを作成
-      TIERS.forEach(tier => {
+      // 各Tier列に各ポジションのポケモンリストを作成
+      POSITIONS.forEach(position => {
         // ポジションでのフィルタリングを行わない
         // 代わりに、ポジションとTierの組み合わせに対して配置されたポケモンを取得
         const tierLocationKey = `${position.id}-${tier.id}`;
-        posMap[position.id][tier.id] = getPokemonsByLocation(tierLocationKey);
+        tierMap[tier.id][position.id] = getPokemonsByLocation(tierLocationKey);
       });
     });
 
-    return posMap;
+    return tierMap;
   }, [getPokemonsByLocation]);
 
   // 未配置ポケモンはポジションで分けずに共通で使用
@@ -76,29 +76,29 @@ const TierList: React.FC = () => {
         </TierListHeader>
 
         <TierListContent>
-          {/* Tierラベルを左側に1列だけ表示 */}
+          {/* ポジションラベルを左側に1列だけ表示 */}
           <TierLabelsColumn>
             <EmptyTierLabel />
-            {TIERS.map(tier => (
-              <TierLabelOnly key={tier.id} backgroundColor={tier.color}>
-                {tier.id}
+            {POSITIONS.map(position => (
+              <TierLabelOnly key={position.id} backgroundColor={positionColors[position.id]}>
+                {position.name}
               </TierLabelOnly>
             ))}
           </TierLabelsColumn>
 
-          {/* 各ポジションの列 */}
-          {POSITIONS.map(position => (
-            <PositionColumn key={position.id}>
-              <PositionHeader backgroundColor={positionColors[position.id]}>
-                {position.name}
+          {/* 各Tierの列 */}
+          {TIERS.map(tier => (
+            <PositionColumn key={tier.id}>
+              <PositionHeader backgroundColor={tier.color}>
+                {tier.id}
               </PositionHeader>
 
-              {TIERS.map(tier => (
+              {POSITIONS.map(position => (
                 <TierRow
                   key={`${position.id}-${tier.id}`}
                   tier={tier.id}
                   color={tier.color}
-                  pokemon={positionTierPokemonMap[position.id][tier.id]}
+                  pokemon={tierPositionPokemonMap[tier.id][position.id]}
                   onMovePokemon={handleMovePokemon}
                   positionId={position.id}
                   hideLabel={true} /* ラベルを非表示にする */

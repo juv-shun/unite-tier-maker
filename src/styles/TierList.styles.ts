@@ -62,7 +62,7 @@ export const TierListContent = styled.div`
 `;
 
 export const TierLabelsColumn = styled.div`
-  width: 40px;
+  width: 150px;
   margin-right: 5px;
 `;
 
