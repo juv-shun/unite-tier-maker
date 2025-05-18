@@ -6,12 +6,12 @@ import { Pokemon, Position, POSITIONS } from '../data/pokemon';
 import { useTierManagement } from '../hooks/useTierManagement';
 import {
   ButtonContainer,
-  EmptyTierLabel,
-  PositionColumn,
-  PositionHeader,
+  EmptyHeaderCell,
+  CategoryColumn,
+  ColumnHeader,
   ResetButton,
-  TierLabelOnly,
-  TierLabelsColumn,
+  LabelCell,
+  LabelsColumn,
   TierListContainer,
   TierListContent,
   TierListHeader,
@@ -77,21 +77,21 @@ const TierList: React.FC = () => {
 
         <TierListContent>
           {/* ポジションラベルを左側に1列だけ表示 */}
-          <TierLabelsColumn>
-            <EmptyTierLabel />
+          <LabelsColumn>
+            <EmptyHeaderCell />
             {POSITIONS.map(position => (
-              <TierLabelOnly key={position.id} backgroundColor={positionColors[position.id]}>
+              <LabelCell key={position.id} backgroundColor={positionColors[position.id]}>
                 {position.name}
-              </TierLabelOnly>
+              </LabelCell>
             ))}
-          </TierLabelsColumn>
+          </LabelsColumn>
 
           {/* 各Tierの列 */}
           {TIERS.map(tier => (
-            <PositionColumn key={tier.id}>
-              <PositionHeader backgroundColor={tier.color}>
+            <CategoryColumn key={tier.id}>
+              <ColumnHeader backgroundColor={tier.color}>
                 {tier.id}
-              </PositionHeader>
+              </ColumnHeader>
 
               {POSITIONS.map(position => (
                 <TierRow
@@ -104,7 +104,7 @@ const TierList: React.FC = () => {
                   hideLabel={true} /* ラベルを非表示にする */
                 />
               ))}
-            </PositionColumn>
+            </CategoryColumn>
           ))}
         </TierListContent>
 

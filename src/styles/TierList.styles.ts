@@ -61,12 +61,12 @@ export const TierListContent = styled.div`
   gap: 5px;
 `;
 
-export const TierLabelsColumn = styled.div`
+export const LabelsColumn = styled.div`
   width: 150px;
   margin-right: 5px;
 `;
 
-export const TierLabelOnly = styled.div<{ backgroundColor: string }>`
+export const LabelCell = styled.div<{ backgroundColor: string }>`
   padding: 0;
   text-align: center;
   background-color: ${props => props.backgroundColor};
@@ -81,12 +81,12 @@ export const TierLabelOnly = styled.div<{ backgroundColor: string }>`
   box-sizing: border-box;
 `;
 
-export const PositionColumn = styled.div`
+export const CategoryColumn = styled.div`
   flex: 1;
   min-width: 0;
 `;
 
-export const PositionHeader = styled.div<{ backgroundColor: string }>`
+export const ColumnHeader = styled.div<{ backgroundColor: string }>`
   padding: 8px;
   text-align: center;
   background-color: ${props => props.backgroundColor};
@@ -97,8 +97,8 @@ export const PositionHeader = styled.div<{ backgroundColor: string }>`
   box-sizing: border-box;
 `;
 
-export const EmptyTierLabel = styled.div`
-  height: 30px; // PositionHeaderの高さに合わせる
+export const EmptyHeaderCell = styled.div`
+  height: 30px; // ColumnHeaderの高さに合わせる
   margin-bottom: 15px;
   box-sizing: border-box;
 `;
