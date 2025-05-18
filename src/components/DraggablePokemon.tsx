@@ -31,12 +31,8 @@ const DraggablePokemon: React.FC<DraggablePokemonProps> = ({ pokemon, index, tie
         isDragging: !!monitor.isDragging(),
       }),
       end: (item, monitor) => {
-        // ドロップが失敗した場合（ドロップ可能なエリア外にドロップした場合）、エリアから削除
-        if (!monitor.didDrop() && item.assignmentId && tierLocation !== TierId.UNASSIGNED) {
-          // エリア外にドロップされた場合、trueを設定して削除処理を実行
-          onMove({ pokemonId: item.id, assignmentId: item.assignmentId }, '', undefined, true);
-          return;
-        }
+        // エリア外ドロップによる削除機能は無効化
+        if (!monitor.didDrop()) return;
       },
     }),
     [pokemon, index, tierLocation, onMove]
