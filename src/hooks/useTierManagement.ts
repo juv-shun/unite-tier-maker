@@ -180,10 +180,19 @@ export const useTierManagement = () => {
     );
   }, []);
 
+  // ポケモンを削除する関数
+  const handleDeletePokemon = useCallback((pokemonId: string, assignmentId: string) => {
+    setAssignments(prevAssignments => {
+      // 指定されたアサインメントIDのポケモンを削除
+      return prevAssignments.filter(a => a.id !== assignmentId);
+    });
+  }, []);
+
   return {
     assignments, // フェーズ2以降で内部状態にするか検討
     getPokemonsByLocation,
     handleMovePokemon,
     handleResetTiers,
+    handleDeletePokemon,
   };
 };

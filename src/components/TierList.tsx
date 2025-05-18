@@ -27,6 +27,7 @@ const TierList: React.FC = () => {
     getPokemonsByLocation,
     handleMovePokemon,
     handleResetTiers,
+    handleDeletePokemon,
   } = useTierManagement();
 
   // useMemoを使用してフィルタリングされたポケモンをキャッシュ
@@ -100,6 +101,7 @@ const TierList: React.FC = () => {
                   color={tier.color}
                   pokemon={tierPositionPokemonMap[tier.id][position.id]}
                   onMovePokemon={handleMovePokemon}
+                  onDeletePokemon={handleDeletePokemon}
                   positionId={position.id}
                   hideLabel={true} /* ラベルを非表示にする */
                 />

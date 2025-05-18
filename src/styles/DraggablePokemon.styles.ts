@@ -3,7 +3,7 @@ import styled from '@emotion/styled';
 /**
  * DraggablePokemonコンポーネントのスタイル
  */
-export const PokemonContainer = styled.div<{ isDragging: boolean; isOver: boolean; canDrop: boolean }>`
+export const PokemonContainer = styled.div<{ isDragging: boolean; isOver: boolean; canDrop: boolean; isSelected?: boolean }>`
   opacity: ${props => props.isDragging ? 0.5 : 1};
   cursor: move;
   width: 60px;
@@ -21,3 +21,31 @@ export const PokemonImage = styled.img`
   height: 100%;
   object-fit: contain;
 `;
+
+export const RemoveButton = styled.div`
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  width: 18px;
+  height: 18px;
+  background-color: rgba(255, 0, 0, 0.8);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: bold;
+  z-index: 10;
+  
+  &:hover {
+    background-color: rgba(255, 0, 0, 1);
+  }
+`;
+
+export const PokemonWrapper = styled.div<{ isSelected?: boolean }>`
+  position: relative;
+  display: inline-block;
+`;
+

@@ -1,17 +1,19 @@
-import React, { useRef, memo } from 'react';
+import React, { useRef, memo, useState } from 'react';
 import { useDrag, useDrop, XYCoord } from 'react-dnd'; 
 import { Pokemon } from '../data/pokemon';
 import { DragItem, DND_ITEM_TYPE, TierId } from '../types';
-import { PokemonContainer, PokemonImage } from '../styles/DraggablePokemon.styles';
+import { PokemonContainer, PokemonImage, RemoveButton, PokemonWrapper } from '../styles/DraggablePokemon.styles';
 
 interface DraggablePokemonProps {
   pokemon: Pokemon & { assignmentId?: string; isFromUnassignedArea?: boolean };
   index: number;  
   tierLocation: string;  
   onMove: (draggedItemInfo: { pokemonId: string; assignmentId?: string }, targetTierLocation: string, targetIndexInTier: number | undefined, isDroppedOutside?: boolean) => void;
+  onDelete?: (pokemonId: string, assignmentId: string) => void;
 }
 
-const DraggablePokemon: React.FC<DraggablePokemonProps> = ({ pokemon, index, tierLocation, onMove }) => {
+const DraggablePokemon: React.FC<DraggablePokemonProps> = ({ pokemon, index, tierLocation, onMove, onDelete }) => {
+  const [isSelected, setIsSelected] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   
   const [{ isDragging }, drag, preview] = useDrag<
@@ -70,18 +72,48 @@ const DraggablePokemon: React.FC<DraggablePokemonProps> = ({ pokemon, index, tie
 
   drag(drop(ref));
 
+  // ポケモンをクリックしたときの処理
+  const handleClick = (event: React.MouseEvent) => {
+    // ドラッグ中はクリックイベントを発火させない
+    if (isDragging) return;
+    
+    // 未割り当てエリアのポケモンの場合は選択状態にしない
+    if (tierLocation === TierId.UNASSIGNED) return;
+    
+    setIsSelected(!isSelected);
+    event.stopPropagation();
+  };
+  
+  // バツボタンクリック時の処理
+  const handleRemove = (event: React.MouseEvent) => {
+    event.stopPropagation();
+    if (onDelete && pokemon.assignmentId) {
+      onDelete(pokemon.id, pokemon.assignmentId);
+      setIsSelected(false);
+    }
+  };
+
   return (
     <PokemonContainer
       ref={ref} 
       isDragging={isDragging}
       isOver={isOver}
       canDrop={dropCanDrop}
+      isSelected={isSelected}
+      onClick={handleClick}
     >
-      <PokemonImage
-        src={pokemon.imageUrl}
-        alt={pokemon.name}
-        title={pokemon.name}
-      />
+      <PokemonWrapper isSelected={isSelected}>
+        <PokemonImage
+          src={pokemon.imageUrl}
+          alt={pokemon.name}
+          title={pokemon.name}
+        />
+        {isSelected && tierLocation !== TierId.UNASSIGNED && (
+          <RemoveButton onClick={handleRemove}>
+            ×
+          </RemoveButton>
+        )}
+      </PokemonWrapper>
     </PokemonContainer>
   );
 };
