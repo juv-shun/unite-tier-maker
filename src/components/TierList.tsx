@@ -62,11 +62,11 @@ const TierList: React.FC = () => {
 
   // ポジションごとの背景色を定義
   const positionColors = {
-    [Position.TOP_CARRIER]: '#FF7F7F', // 赤
-    [Position.TOP_EXP]: '#FFBF7F', // オレンジ
-    [Position.JUNGLER]: '#FFDF7F', // 黄色っぽいオレンジ
-    [Position.BOTTOM_CARRIER]: '#7FFF7F', // 緑
-    [Position.BOTTOM_EXP]: '#7FBFFF', // 青
+    [Position.TOP_CARRIER]: '#7b68ee', // 紫
+    [Position.TOP_EXP]: '#FFDF7F', // 黄色っぽいオレンジ
+    [Position.JUNGLER]: '#7FBFFF', // 青
+    [Position.BOTTOM_CARRIER]: '#FF7F7F', // 赤
+    [Position.BOTTOM_EXP]: '#7FFF7F', // 緑
   };
 
   return (
