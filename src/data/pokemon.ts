@@ -1,17 +1,17 @@
 export enum Position {
-  ATTACKER = 'attacker',
-  SPEEDSTER = 'speedster',
-  ALL_ROUNDER = 'all-rounder',
-  DEFENDER = 'defender',
-  SUPPORTER = 'supporter'
+  TOP_CARRIER = 'attacker',
+  TOP_EXP = 'speedster',
+  JUNGLER = 'all-rounder',
+  BOTTOM_CARRIER = 'defender',
+  BOTTOM_EXP = 'supporter'
 }
 
 export const POSITIONS = [
-  { id: Position.ATTACKER, name: '上キャリー' },
-  { id: Position.SPEEDSTER, name: '上学習' },
-  { id: Position.ALL_ROUNDER, name: '中央エリア' },
-  { id: Position.DEFENDER, name: '下キャリー' },
-  { id: Position.SUPPORTER, name: '下学習' }
+  { id: Position.TOP_CARRIER, name: '上キャリー' },
+  { id: Position.TOP_EXP, name: '上学習' },
+  { id: Position.JUNGLER, name: '中央エリア' },
+  { id: Position.BOTTOM_CARRIER, name: '下キャリー' },
+  { id: Position.BOTTOM_EXP, name: '下学習' }
 ];
 
 export interface Pokemon {

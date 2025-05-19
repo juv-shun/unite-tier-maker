@@ -6,12 +6,12 @@ import { Pokemon, Position, POSITIONS } from '../data/pokemon';
 import { useTierManagement } from '../hooks/useTierManagement';
 import {
   ButtonContainer,
-  EmptyHeaderCell,
   CategoryColumn,
   ColumnHeader,
-  ResetButton,
+  EmptyHeaderCell,
   LabelCell,
   LabelsColumn,
+  ResetButton,
   TierListContainer,
   TierListContent,
   TierListHeader,
@@ -62,11 +62,11 @@ const TierList: React.FC = () => {
 
   // ポジションごとの背景色を定義
   const positionColors = {
-    [Position.ATTACKER]: '#FF7F7F', // 赤
-    [Position.SPEEDSTER]: '#FFBF7F', // オレンジ
-    [Position.ALL_ROUNDER]: '#FFDF7F', // 黄色っぽいオレンジ
-    [Position.DEFENDER]: '#7FFF7F', // 緑
-    [Position.SUPPORTER]: '#7FBFFF', // 青
+    [Position.TOP_CARRIER]: '#FF7F7F', // 赤
+    [Position.TOP_EXP]: '#FFBF7F', // オレンジ
+    [Position.JUNGLER]: '#FFDF7F', // 黄色っぽいオレンジ
+    [Position.BOTTOM_CARRIER]: '#7FFF7F', // 緑
+    [Position.BOTTOM_EXP]: '#7FBFFF', // 青
   };
 
   return (
