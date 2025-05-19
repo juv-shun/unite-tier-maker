@@ -7,7 +7,7 @@ import { TierId } from '../types';
 export const TIERS = [
   { id: TierId.S, color: '#FF7F7F' }, // 赤
   { id: TierId.A, color: '#FFBF7F' }, // オレンジ
-  { id: TierId.B, color: '#FFFF7F' }, // 黄色
+  { id: TierId.B, color: '#FFDF7F' }, // 黄色っぽいオレンジ
   { id: TierId.C, color: '#7FFF7F' }, // 緑
   // D列を削除
 ];
