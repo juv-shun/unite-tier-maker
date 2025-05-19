@@ -57,6 +57,11 @@ export const useTierManagement = () => {
     return result;
   }, [assignments, getPokemonById]);
 
+  // 指定されたTierに特定のポケモンIDが存在するかチェックする関数
+  const isPokemonInTier = useCallback((assignments: PokemonAssignment[], pokemonId: string, tierLocation: string): boolean => {
+    return assignments.some(a => a.pokemonId === pokemonId && a.location === tierLocation);
+  }, []);
+
   // ドラッグアンドドロップの引数をポケモンIDからアサインメントIDに変更し、外部へのドロップフラグを追加
   const handleMovePokemon = useCallback((draggedItemInfo: { pokemonId: string; assignmentId?: string }, targetTierLocation: string, targetIndexInTier: number | undefined, isDroppedOutside: boolean = false) => {
     setAssignments(prevAssignments => {
@@ -74,6 +79,17 @@ export const useTierManagement = () => {
         assignmentsCopy.find(a => a.pokemonId === draggedItemInfo.pokemonId && a.location === TierId.UNASSIGNED);
         
       if (!draggedPokemonAssignment) return prevAssignments;
+      
+      // 未配置エリア以外では、同じポケモンを同じエリアに複数配置できないようにする
+      // ただし、同じエリア内での移動（位置の変更）は許可する
+      if (targetTierLocation !== TierId.UNASSIGNED && draggedPokemonAssignment.location !== targetTierLocation) {
+        // 移動先のエリアに同じポケモンが存在するかチェック
+        const hasDuplicate = isPokemonInTier(assignmentsCopy, draggedPokemonAssignment.pokemonId, targetTierLocation);
+        if (hasDuplicate) {
+          // 重複があるので移動を許可しない
+          return prevAssignments;
+        }
+      }
       
       // 未配置エリアからのドラッグの場合は新しいアサインメントを作成
       if (draggedPokemonAssignment.location === TierId.UNASSIGNED && !draggedItemInfo.assignmentId) {
@@ -165,7 +181,7 @@ export const useTierManagement = () => {
         return finalAssignments;
       }
     });
-  }, []);
+  }, [isPokemonInTier]);
 
   // すべてのポケモンを未配置状態にリセット
   const handleResetTiers = useCallback(() => {
