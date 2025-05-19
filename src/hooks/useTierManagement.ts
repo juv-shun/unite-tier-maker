@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
-import { Pokemon, pokemonList, Position, POSITIONS } from '../data/pokemon';
+import { Pokemon, pokemonList } from '../data/pokemon';
 import { PokemonAssignment, TierId } from '../types';
-import { TIERS } from '../constants/tiers';
+
 
 // 型定義とTIERSは types と constants に移動しました
 
