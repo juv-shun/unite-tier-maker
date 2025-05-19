@@ -73,7 +73,7 @@ const TierList: React.FC = () => {
     <DndProvider backend={HTML5Backend}>
       <TierListContainer>
         <TierListHeader>
-          <h1>ポケモンユナイト Tierリスト</h1>
+          <h1>Pokemon Unite Tier Maker</h1>
         </TierListHeader>
 
         <TierListContent>
