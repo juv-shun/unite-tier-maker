@@ -6,10 +6,9 @@ import styled from '@emotion/styled';
 export const PokemonContainer = styled.div<{ isDragging: boolean; isOver: boolean; canDrop: boolean; isSelected?: boolean }>`
   opacity: ${props => props.isDragging ? 0.5 : 1};
   cursor: move;
-  width: 60px;
-  height: 60px;
-  margin-top: 5px;
-  margin-bottom: 5px;
+  width: 50px;
+  height: 50px;
+  margin: 5px;
   display: inline-block;
   background-color: ${props => props.isOver && props.canDrop ? 'rgba(0, 255, 0, 0.1)' : 'transparent'};
   border-radius: 4px;
@@ -38,7 +37,7 @@ export const RemoveButton = styled.div`
   font-size: 12px;
   font-weight: bold;
   z-index: 10;
-  
+
   &:hover {
     background-color: rgba(255, 0, 0, 1);
   }
@@ -48,4 +47,3 @@ export const PokemonWrapper = styled.div<{ isSelected?: boolean }>`
   position: relative;
   display: inline-block;
 `;
-

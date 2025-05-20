@@ -56,8 +56,8 @@ export const TierListHeader = styled.div`
 
 export const TierListContent = styled.div`
   display: flex;
-  flex-direction: row;
-  justify-content: space-between;
+  flex-direction: column;
+  justify-content: flex-start;
   gap: 5px;
 `;
 
@@ -74,6 +74,7 @@ export const LabelCell = styled.div<{ backgroundColor: string }>`
   font-weight: bold;
   border-radius: 4px;
   margin-bottom: 5px;
+  width: 130px;
   height: 70px;
   display: flex;
   align-items: center;
@@ -87,7 +88,9 @@ export const CategoryColumn = styled.div`
 `;
 
 export const ColumnHeader = styled.div<{ backgroundColor: string }>`
+  flex: 1;
   padding: 8px;
+  margin-left: 10px;
   text-align: center;
   background-color: ${props => props.backgroundColor};
   color: white;
@@ -98,14 +101,15 @@ export const ColumnHeader = styled.div<{ backgroundColor: string }>`
 `;
 
 export const EmptyHeaderCell = styled.div`
+  width: 130px; // LabelCell と同幅
   height: 30px; // ColumnHeaderの高さに合わせる
   margin-bottom: 15px;
   box-sizing: border-box;
 `;
 
 export const UnassignedContainer = styled.div`
-  margin-top: 30px;
-  padding: 15px;
+  margin-top: 10px;
+  padding: 10px;
   background-color: #f5f5f5;
   border-radius: 5px;
 `;
@@ -117,7 +121,7 @@ export const UnassignedGrid = styled.div`
 
 export const ButtonContainer = styled.div`
   text-align: center;
-  margin-top: 20px;
+  margin-top: 10px;
 `;
 
 export const ResetButton = styled.button`

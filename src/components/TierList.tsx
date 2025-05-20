@@ -6,11 +6,9 @@ import { Pokemon, Position, POSITIONS } from '../data/pokemon';
 import { useTierManagement } from '../hooks/useTierManagement';
 import {
   ButtonContainer,
-  CategoryColumn,
   ColumnHeader,
   EmptyHeaderCell,
   LabelCell,
-  LabelsColumn,
   ResetButton,
   TierListContainer,
   TierListContent,
@@ -77,24 +75,26 @@ const TierList: React.FC = () => {
         </TierListHeader>
 
         <TierListContent>
-          {/* ポジションラベルを左側に1列だけ表示 */}
-          <LabelsColumn>
+          {/* Tier名ヘッダー行 */}
+          <div style={{ display: 'flex', flex: 1 }}>
             <EmptyHeaderCell />
-            {POSITIONS.map(position => (
-              <LabelCell key={position.id} backgroundColor={positionColors[position.id]}>
-                {position.name}
-              </LabelCell>
-            ))}
-          </LabelsColumn>
-
-          {/* 各Tierの列 */}
-          {TIERS.map(tier => (
-            <CategoryColumn key={tier.id}>
-              <ColumnHeader backgroundColor={tier.color}>
+            {TIERS.map(tier => (
+              <ColumnHeader key={tier.id} backgroundColor={tier.color}>
                 {tier.id}
               </ColumnHeader>
+            ))}
+          </div>
 
-              {POSITIONS.map(position => (
+          {/* ポジションごとの行 */}
+          {POSITIONS.map(position => (
+            <div key={position.id} style={{ display: 'flex', marginBottom: 5 }}>
+              {/* 行ラベル */}
+              <LabelCell backgroundColor={positionColors[position.id]}>
+                {position.name}
+              </LabelCell>
+
+              {/* 各Tierセル */}
+              {TIERS.map(tier => (
                 <TierRow
                   key={`${position.id}-${tier.id}`}
                   tier={tier.id}
@@ -103,10 +103,10 @@ const TierList: React.FC = () => {
                   onMovePokemon={handleMovePokemon}
                   onDeletePokemon={handleDeletePokemon}
                   positionId={position.id}
-                  hideLabel={true} /* ラベルを非表示にする */
+                  hideLabel={true}
                 />
               ))}
-            </CategoryColumn>
+            </div>
           ))}
         </TierListContent>
 
