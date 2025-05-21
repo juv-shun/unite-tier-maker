@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { Pokemon, pokemonList } from '../data/pokemon';
 import { PokemonAssignment, TierId } from '../types';
 
@@ -11,6 +11,15 @@ const generateAssignmentId = (): string => {
 };
 
 export const useTierManagement = () => {
+  // ポケモンの元の順序を保持するマップを作成
+  const pokemonOriginalOrderMap = useMemo(() => {
+    const orderMap: Record<string, number> = {};
+    pokemonList.forEach((pokemon, index) => {
+      orderMap[pokemon.id] = index;
+    });
+    return orderMap;
+  }, []);
+
   // assignmentIdを追加して、同じポケモンが複数の場所に配置できるようにする
   const [assignments, setAssignments] = useState<PokemonAssignment[]>(
     pokemonList.map((pokemon, index) => ({
@@ -27,9 +36,16 @@ export const useTierManagement = () => {
   }, []);
 
   const getPokemonsByLocation = useCallback((location: string): Pokemon[] => {
+    // 未配置エリアの場合は元のポケモン順序を使用し、それ以外は位置でソート
     const filtered = assignments
       .filter(assignment => assignment.location === location)
-      .sort((a, b) => a.position - b.position);
+      .sort((a, b) => {
+        if (location === TierId.UNASSIGNED) {
+          // 未配置エリアでは元のポケモン順序（pokemonList内の順序）を使用
+          return pokemonOriginalOrderMap[a.pokemonId] - pokemonOriginalOrderMap[b.pokemonId];
+        }
+        return a.position - b.position;
+      });
 
     // 未配置エリアは同じポケモンが複数表示されないように重複排除
     const seen = new Set<string>();
