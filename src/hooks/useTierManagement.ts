@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useEffect } from 'react';
 import { Pokemon, pokemonList } from '../data/pokemon';
 import { PokemonAssignment, TierId } from '../types';
 
@@ -20,16 +20,44 @@ export const useTierManagement = () => {
     return orderMap;
   }, []);
 
-  // assignmentIdを追加して、同じポケモンが複数の場所に配置できるようにする
-  const [assignments, setAssignments] = useState<PokemonAssignment[]>(
-    pokemonList.map((pokemon, index) => ({
+  // localStorageから保存されたassignmentsを取得する関数
+  const getSavedAssignments = useCallback((): PokemonAssignment[] | null => {
+    try {
+      const savedAssignments = localStorage.getItem('tierAssignments');
+      console.log('localStorageから読み込まれた状態:', savedAssignments);
+      if (savedAssignments) {
+        const parsed = JSON.parse(savedAssignments);
+        console.log('パース後の状態:', parsed);
+        return parsed;
+      }
+    } catch (e) {
+      console.error('localStorageからの状態復元に失敗しました:', e);
+    }
+    return null;
+  }, []);
+
+  // 初期状態を設定
+  const initialAssignments = useMemo(() => {
+    console.log('初期状態の設定を開始');
+    const savedAssignments = getSavedAssignments();
+    if (savedAssignments && savedAssignments.length > 0) {
+      console.log('保存された状態を使用します');
+      return savedAssignments;
+    }
+    
+    console.log('新しい初期状態を作成します');
+    // 保存された状態がない場合は初期状態を作成
+    return pokemonList.map((pokemon, index) => ({
       id: generateAssignmentId(),
       pokemonId: pokemon.id,
       location: TierId.UNASSIGNED, // 初期状態ではunassigned
       position: index,
       isFromUnassignedArea: true // 未配置エリアから来たポケモンかどうかのフラグ
-    }))
-  );
+    }));
+  }, [getSavedAssignments]);
+
+  // assignmentIdを追加して、同じポケモンが複数の場所に配置できるようにする
+  const [assignments, setAssignments] = useState<PokemonAssignment[]>(initialAssignments);
 
   const getPokemonById = useCallback((id: string): Pokemon | undefined => {
     return pokemonList.find(pokemon => pokemon.id === id);
@@ -79,6 +107,36 @@ export const useTierManagement = () => {
   }, []);
 
   // ドラッグアンドドロップの引数をポケモンIDからアサインメントIDに変更し、外部へのドロップフラグを追加
+  // localStorageに状態を保存する関数
+  const saveAssignmentsToStorage = useCallback((assignments: PokemonAssignment[]) => {
+    try {
+      const assignmentsStr = JSON.stringify(assignments);
+      console.log('localStorageに保存する状態:', assignmentsStr);
+      localStorage.setItem('tierAssignments', assignmentsStr);
+      // 保存されたことを確認
+      console.log('保存後のlocalStorage:', localStorage.getItem('tierAssignments'));
+    } catch (e) {
+      console.error('localStorageへの保存に失敗しました:', e);
+    }
+  }, []);
+
+  // 状態が変更されたらlocalStorageに保存
+  useEffect(() => {
+    console.log('状態が変更されました、localStorageに保存します');
+    saveAssignmentsToStorage(assignments);
+  }, [assignments, saveAssignmentsToStorage]);
+  
+  // 初回マウント時に一度localStorageに保存して確認
+  useEffect(() => {
+    console.log('コンポーネントがマウントされました');
+    const savedData = localStorage.getItem('tierAssignments');
+    console.log('現在のlocalStorage状態:', savedData);
+    if (!savedData) {
+      console.log('初期状態をlocalStorageに保存します');
+      saveAssignmentsToStorage(assignments);
+    }
+  }, [assignments, saveAssignmentsToStorage]); // 依存配列に必要な値を追加
+
   const handleMovePokemon = useCallback((draggedItemInfo: { pokemonId: string; assignmentId?: string }, targetTierLocation: string, targetIndexInTier: number | undefined, isDroppedOutside: boolean = false) => {
     setAssignments(prevAssignments => {
       let assignmentsCopy = prevAssignments.map(a => ({ ...a }));
@@ -201,15 +259,17 @@ export const useTierManagement = () => {
 
   // すべてのポケモンを未配置状態にリセット
   const handleResetTiers = useCallback(() => {
-    setAssignments(
-      pokemonList.map((pokemon, index) => ({
-        id: generateAssignmentId(),
-        pokemonId: pokemon.id,
-        location: TierId.UNASSIGNED,
-        position: index,
-        isFromUnassignedArea: true
-      }))
-    );
+    const resetAssignments = pokemonList.map((pokemon, index) => ({
+      id: generateAssignmentId(),
+      pokemonId: pokemon.id,
+      location: TierId.UNASSIGNED,
+      position: index,
+      isFromUnassignedArea: true
+    }));
+    setAssignments(resetAssignments);
+    // リセット時にlocalStorageもクリア
+    localStorage.removeItem('tierAssignments');
+    console.log('Tierリセット: localStorageをクリアしました');
   }, []);
 
   // ポケモンを削除する関数
@@ -226,5 +286,6 @@ export const useTierManagement = () => {
     handleMovePokemon,
     handleResetTiers,
     handleDeletePokemon,
+    saveAssignmentsToStorage, // 外部から直接localStorageに保存できるようにエクスポート
   };
 };
