@@ -1,5 +1,5 @@
 import React, { useRef, memo, useState } from 'react';
-import { useDrag, useDrop, XYCoord } from 'react-dnd'; 
+import { useDrag, useDrop } from 'react-dnd'; 
 import { Pokemon } from '../data/pokemon';
 import { DragItem, DND_ITEM_TYPE, TierId } from '../types';
 import { PokemonContainer, PokemonImage, RemoveButton, PokemonWrapper } from '../styles/DraggablePokemon.styles';
@@ -16,7 +16,7 @@ const DraggablePokemon: React.FC<DraggablePokemonProps> = ({ pokemon, index, tie
   const [isSelected, setIsSelected] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   
-  const [{ isDragging }, drag, preview] = useDrag<
+  const [{ isDragging }, drag] = useDrag<
     DragItem, 
     void,    
     { isDragging: boolean } 

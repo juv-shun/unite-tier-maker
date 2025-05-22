@@ -71,7 +71,7 @@ export const useTierManagement = () => {
     });
 
     return result;
-  }, [assignments, getPokemonById]);
+  }, [assignments, getPokemonById, pokemonOriginalOrderMap]);
 
   // 指定されたTierに特定のポケモンIDが存在するかチェックする関数
   const isPokemonInTier = useCallback((assignments: PokemonAssignment[], pokemonId: string, tierLocation: string): boolean => {
