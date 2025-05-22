@@ -58,7 +58,6 @@ export const TierListContent = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  gap: 5px;
 `;
 
 export const LabelsColumn = styled.div`
@@ -73,7 +72,6 @@ export const LabelCell = styled.div<{ backgroundColor: string }>`
   color: white;
   font-weight: bold;
   border-radius: 4px;
-  margin-bottom: 5px;
   width: 130px;
   height: 70px;
   display: flex;
@@ -90,13 +88,13 @@ export const CategoryColumn = styled.div`
 export const ColumnHeader = styled.div<{ backgroundColor: string }>`
   flex: 1;
   padding: 8px;
-  margin-left: 10px;
+  margin-left: 5px;
+  margin-bottom: 5px;
   text-align: center;
   background-color: ${props => props.backgroundColor};
   color: white;
   font-weight: bold;
   border-radius: 4px 4px 0 0;
-  margin-bottom: 5px;
   box-sizing: border-box;
 `;
 

@@ -5,7 +5,6 @@ import styled from '@emotion/styled';
  */
 export const TierRowContainer = styled.div`
   display: flex;
-  margin-bottom: 5px;
   flex: 1;
 `;
 
@@ -26,6 +25,6 @@ export const TierContent = styled.div<{ isOver: boolean }>`
   background-color: ${props => props.isOver ? 'rgba(0, 0, 0, 0.1)' : 'rgba(0, 0, 0, 0.05)'};
   display: flex;
   flex-wrap: wrap;
-  margin-left: 10px;
+  margin-left: 5px;
   transition: background-color 0.2s ease;
 `;
