@@ -48,15 +48,20 @@ const DraggablePokemon: React.FC<DraggablePokemonProps> = ({ pokemon, index, tie
     () => ({
       accept: DND_ITEM_TYPE,
       hover: (draggedItem: DragItem, monitor) => { 
+        // hoverでは移動処理を行わず、ビジュアルフィードバックのみ提供
+        if (!ref.current) return;
+        if (draggedItem.id === pokemon.id && draggedItem.assignmentId === pokemon.assignmentId) return;
+        
+        // ここでは実際の移動処理は行わない
+      },
+      drop: (draggedItem: DragItem, monitor) => {
+        // dropイベントでのみ移動処理を実行
         if (!ref.current) return;
         if (draggedItem.id === pokemon.id && draggedItem.assignmentId === pokemon.assignmentId) return;
 
         const hoverIndex = index;
         // アサインメントIDを含む呼び出しに変更
         onMove({ pokemonId: draggedItem.id, assignmentId: draggedItem.assignmentId }, tierLocation, hoverIndex, false);
-
-        draggedItem.originalIndex = hoverIndex;
-        draggedItem.originalTierLocation = tierLocation;
       },
       canDrop: (draggedItem: DragItem) => { 
         // 同じポケモンでもアサインメントIDが異なれば許可（複数配置のため）
