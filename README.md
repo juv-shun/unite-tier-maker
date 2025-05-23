@@ -1,46 +1,72 @@
-# Getting Started with Create React App
+# Unite Tier Maker
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+ポケモンのTierリストをドラッグ＆ドロップで直感的に作成・管理できるWebアプリケーション。
 
-## Available Scripts
+## 特徴
+- 未配置エリアからTier（S, A, B, C）へのドラッグ＆ドロップによる直感的な操作
+- Tier内での並び替え、削除、リセット機能
+- localStorageを用いた割り当て情報の永続化
+- React.memoやuseMemoによるパフォーマンス最適化
 
-In the project directory, you can run:
+## 技術スタック
+- フレームワーク: React (TypeScript)
+- ドラッグ＆ドロップ: react-dnd + react-dnd-html5-backend
+- スタイリング: Emotion (@emotion/react, @emotion/styled)
+- パッケージ管理: npm
+- テスト: @testing-library/react
+- コード品質: ESLint, TypeScript
 
-### `npm start`
+## セットアップ
+```bash
+# リポジトリをクローン
+git clone https://github.com/juv-shun/unite-tier-maker.git
+cd unite-tier-maker
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+# 依存関係をインストール
+npm install
+```
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+## 実行
+```bash
+# 開発用サーバー起動
+npm start
+```
+ブラウザで http://localhost:3000 を開きます。
 
-### `npm test`
+## ビルド
+```bash
+# 本番用ビルド
+npm run build
+```
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## プロジェクト構成
+```
+unite-tier-maker/
+├── public/                # HTMLテンプレートなど静的ファイル
+├── src/
+│   ├── components/        # UIコンポーネント
+│   ├── hooks/             # カスタムフック(useTierManagement)
+│   ├── contexts/          # コンテキスト(PokemonContext)
+│   ├── constants/         # 定数定義(TIER一覧など)
+│   ├── data/              # ポケモンデータ定義
+│   ├── styles/            # Emotionによるスタイル定義
+│   ├── types/             # TypeScript型定義
+│   ├── App.tsx            # アプリエントリポイント
+│   └── index.tsx          # ReactDOMレンダリング
+└── package.json           # プロジェクト情報＆スクリプト
+```
 
-### `npm run build`
+## 使用方法
+1. 未配置エリアからポケモンをドラッグして任意のTierに配置
+2. Tier内でドラッグして順序を変更
+3. 選択状態で「×」ボタンをクリックし配置解除
+4. 「リセット」ボタンで全Tierを初期状態に戻す
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## デプロイ
+NetlifyやVercelなどの静的サイトホスティングに対応。ビルド成果物を`build/`フォルダに配置して公開します。
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## ライセンス
+MIT
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
+## 作者
+juv-shun
