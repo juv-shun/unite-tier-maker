@@ -58,7 +58,7 @@ const TierRow: React.FC<TierRowProps> = ({
   return (
     <TierRowContainer>
       {!hideLabel && <TierLabel backgroundColor={color}>{tier}</TierLabel>}
-      <TierContent ref={ref} isOver={isOver}>
+      <TierContent ref={ref} isOver={isOver} data-testid={`tier-cell-${locationKey}`}>
         {pokemon.map((p, index) => (
           <DraggablePokemon
             key={`${p.id}-${p.assignmentId ?? "base"}`}
