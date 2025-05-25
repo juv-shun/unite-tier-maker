@@ -1,7 +1,7 @@
-import React from 'react';
-import './App.css';
-import TierList from './components/TierList';
-import { PokemonProvider } from './contexts/PokemonContext';
+import React from "react";
+import "./App.css";
+import TierList from "./components/TierList";
+import { PokemonProvider } from "./contexts/PokemonContext";
 
 function App() {
   return (

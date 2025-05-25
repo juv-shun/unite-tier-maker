@@ -1,4 +1,4 @@
-import { css } from '@emotion/react';
+import { css } from "@emotion/react";
 
 /**
  * アプリケーション全体で使用する共通スタイル

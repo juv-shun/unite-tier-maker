@@ -1,4 +1,4 @@
-import { Position } from '../data/pokemon';
+import { Position } from "../data/pokemon";
 
 /**
  * ポケモンデータの型定義
@@ -14,12 +14,12 @@ export interface Pokemon {
  * Tier IDの列挙型
  */
 export enum TierId {
-  S = 'S',
-  A = 'A',
-  B = 'B',
-  C = 'C',
+  S = "S",
+  A = "A",
+  B = "B",
+  C = "C",
   // D値を削除
-  UNASSIGNED = 'unassigned'
+  UNASSIGNED = "unassigned",
 }
 
 /**
@@ -46,4 +46,4 @@ export interface PokemonAssignment {
 /**
  * DnDアイテムタイプの定数
  */
-export const DND_ITEM_TYPE = 'pokemon' as const;
+export const DND_ITEM_TYPE = "pokemon" as const;

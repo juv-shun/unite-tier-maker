@@ -1,4 +1,4 @@
-import styled from '@emotion/styled';
+import styled from "@emotion/styled";
 
 /**
  * TierRowコンポーネントのスタイル
@@ -9,7 +9,7 @@ export const TierRowContainer = styled.div`
 `;
 
 export const TierLabel = styled.div<{ backgroundColor: string }>`
-  background-color: ${props => props.backgroundColor};
+  background-color: ${(props) => props.backgroundColor};
   color: white;
   font-weight: bold;
   padding: 10px;
@@ -22,7 +22,7 @@ export const TierLabel = styled.div<{ backgroundColor: string }>`
 export const TierContent = styled.div<{ isOver: boolean }>`
   flex: 1;
   min-height: 70px;
-  background-color: ${props => props.isOver ? 'rgba(0, 0, 0, 0.1)' : 'rgba(0, 0, 0, 0.05)'};
+  background-color: ${(props) => (props.isOver ? "rgba(0, 0, 0, 0.1)" : "rgba(0, 0, 0, 0.05)")};
   display: flex;
   flex-wrap: wrap;
   margin-left: 5px;

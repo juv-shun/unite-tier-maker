@@ -1,18 +1,26 @@
-import styled from '@emotion/styled';
+import styled from "@emotion/styled";
 
 /**
  * DraggablePokemonコンポーネントのスタイル
  */
-export const PokemonContainer = styled.div<{ isDragging: boolean; isOver: boolean; canDrop: boolean; isSelected?: boolean }>`
-  opacity: ${props => props.isDragging ? 0.5 : 1};
+export const PokemonContainer = styled.div<{
+  isDragging: boolean;
+  isOver: boolean;
+  canDrop: boolean;
+  isSelected?: boolean;
+}>`
+  opacity: ${(props) => (props.isDragging ? 0.5 : 1)};
   cursor: move;
   width: 50px;
   height: 50px;
   margin: 10px 0px 10px 5px;
   display: inline-block;
-  background-color: ${props => props.isOver && props.canDrop ? 'rgba(0, 255, 0, 0.1)' : 'transparent'};
+  background-color: ${(props) =>
+    props.isOver && props.canDrop ? "rgba(0, 255, 0, 0.1)" : "transparent"};
   border-radius: 4px;
-  transition: opacity 0.2s ease, background-color 0.2s ease;
+  transition:
+    opacity 0.2s ease,
+    background-color 0.2s ease;
 `;
 
 export const PokemonImage = styled.img`

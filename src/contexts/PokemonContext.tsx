@@ -1,5 +1,5 @@
-import React, { createContext, useContext, ReactNode } from 'react';
-import { Pokemon, pokemonList } from '../data/pokemon';
+import React, { createContext, useContext, ReactNode } from "react";
+import { Pokemon, pokemonList } from "../data/pokemon";
 
 /**
  * ポケモンデータのコンテキスト型定義
@@ -24,7 +24,7 @@ const PokemonContext = createContext<PokemonContextType>(defaultContextValue);
 export const PokemonProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   // ポケモンをIDで検索する関数
   const getPokemonById = (id: string): Pokemon | undefined => {
-    return pokemonList.find(pokemon => pokemon.id === id);
+    return pokemonList.find((pokemon) => pokemon.id === id);
   };
 
   // コンテキスト値
@@ -33,11 +33,7 @@ export const PokemonProvider: React.FC<{ children: ReactNode }> = ({ children })
     getPokemonById,
   };
 
-  return (
-    <PokemonContext.Provider value={value}>
-      {children}
-    </PokemonContext.Provider>
-  );
+  return <PokemonContext.Provider value={value}>{children}</PokemonContext.Provider>;
 };
 
 /**
@@ -46,7 +42,7 @@ export const PokemonProvider: React.FC<{ children: ReactNode }> = ({ children })
 export const usePokemon = (): PokemonContextType => {
   const context = useContext(PokemonContext);
   if (context === undefined) {
-    throw new Error('usePokemon must be used within a PokemonProvider');
+    throw new Error("usePokemon must be used within a PokemonProvider");
   }
   return context;
 };

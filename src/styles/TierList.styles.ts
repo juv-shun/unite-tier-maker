@@ -1,5 +1,5 @@
-import { css } from '@emotion/react';
-import styled from '@emotion/styled';
+import { css } from "@emotion/react";
+import styled from "@emotion/styled";
 
 /**
  * TierListコンポーネントのスタイル
@@ -68,7 +68,7 @@ export const LabelsColumn = styled.div`
 export const LabelCell = styled.div<{ backgroundColor: string }>`
   padding: 0;
   text-align: center;
-  background-color: ${props => props.backgroundColor};
+  background-color: ${(props) => props.backgroundColor};
   color: white;
   font-weight: bold;
   border-radius: 4px;
@@ -91,7 +91,7 @@ export const ColumnHeader = styled.div<{ backgroundColor: string }>`
   margin-left: 5px;
   margin-bottom: 5px;
   text-align: center;
-  background-color: ${props => props.backgroundColor};
+  background-color: ${(props) => props.backgroundColor};
   color: white;
   font-weight: bold;
   border-radius: 4px 4px 0 0;
