@@ -35,5 +35,6 @@ jobs:
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           allowed_tools:
+            - "Bash(npm install:*)"
             - "Bash(npm test:*)"
             - "Bash(npm run build:*)"
