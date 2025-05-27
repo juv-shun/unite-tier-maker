@@ -20,6 +20,7 @@ interface DraggablePokemonProps {
     isDroppedOutside?: boolean
   ) => void;
   onDelete?: (pokemonId: string, assignmentId: string) => void;
+  isPlacedInTier?: boolean;
 }
 
 const DraggablePokemon: React.FC<DraggablePokemonProps> = ({
@@ -28,6 +29,7 @@ const DraggablePokemon: React.FC<DraggablePokemonProps> = ({
   tierLocation,
   onMove,
   onDelete,
+  isPlacedInTier = false,
 }) => {
   const [isSelected, setIsSelected] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -129,7 +131,12 @@ const DraggablePokemon: React.FC<DraggablePokemonProps> = ({
       onClick={handleClick}
     >
       <PokemonWrapper isSelected={isSelected}>
-        <PokemonImage src={pokemon.imageUrl} alt={pokemon.name} title={pokemon.name} />
+        <PokemonImage 
+          src={pokemon.imageUrl} 
+          alt={pokemon.name} 
+          title={pokemon.name}
+          className={tierLocation === TierId.UNASSIGNED && isPlacedInTier ? "is-placed-in-tier" : ""}
+        />
         {isSelected && tierLocation !== TierId.UNASSIGNED && (
           <RemoveButton onClick={handleRemove}>×</RemoveButton>
         )}

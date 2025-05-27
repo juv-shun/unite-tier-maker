@@ -21,13 +21,19 @@ import DraggablePokemon from "./DraggablePokemon";
 import TierRow from "./TierRow";
 
 const TierList: React.FC = () => {
-  const { getPokemonsByLocation, handleMovePokemon, handleResetTiers, handleDeletePokemon } =
+  const { getPokemonsByLocation, getPlacedPokemonIds, handleMovePokemon, handleResetTiers, handleDeletePokemon } =
     useTierManagement();
 
   // useMemoを使用してフィルタリングされたポケモンをキャッシュ
   const unassignedPokemon = useMemo(
     () => getPokemonsByLocation(TierId.UNASSIGNED),
     [getPokemonsByLocation]
+  );
+
+  // 配置済みポケモンIDのセットを取得
+  const placedPokemonIds = useMemo(
+    () => getPlacedPokemonIds(),
+    [getPlacedPokemonIds]
   );
 
   // 各Tierで各ポジション用のポケモンリストをキャッシュ
@@ -107,7 +113,7 @@ const TierList: React.FC = () => {
           ))}
         </TierListContent>
 
-        <UnassignedContainer>
+        <UnassignedContainer data-testid="unplaced-area">
           <UnassignedGrid>
             {unassignedPokemon.map((pokemon, index) => (
               <DraggablePokemon
@@ -115,6 +121,7 @@ const TierList: React.FC = () => {
                 pokemon={pokemon}
                 tierLocation={TierId.UNASSIGNED}
                 index={index}
+                isPlacedInTier={placedPokemonIds.has(pokemon.id)}
                 onMove={(
                   draggedItemInfo,
                   targetTierLocation,

@@ -315,9 +315,21 @@ export const useTierManagement = () => {
     });
   }, []);
 
+  // 配置済みポケモンIDのセットを取得する関数
+  const getPlacedPokemonIds = useCallback((): Set<string> => {
+    const placedIds = new Set<string>();
+    assignments.forEach((assignment) => {
+      if (assignment.location !== TierId.UNASSIGNED) {
+        placedIds.add(assignment.pokemonId);
+      }
+    });
+    return placedIds;
+  }, [assignments]);
+
   return {
     assignments, // フェーズ2以降で内部状態にするか検討
     getPokemonsByLocation,
+    getPlacedPokemonIds,
     handleMovePokemon,
     handleResetTiers,
     handleDeletePokemon,

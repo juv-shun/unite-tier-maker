@@ -36,3 +36,15 @@
     transform: rotate(360deg);
   }
 }
+
+/* 配置済みポケモンの視覚的区別 */
+.is-placed-in-tier {
+  filter: grayscale(100%);
+  opacity: 0.6;
+  transition: filter 0.3s ease, opacity 0.3s ease;
+}
+
+.is-placed-in-tier:hover {
+  filter: grayscale(50%);
+  opacity: 0.8;
+}

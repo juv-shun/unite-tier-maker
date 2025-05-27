@@ -36,12 +36,14 @@ const mockUseTierManagement = useTierManagement as jest.MockedFunction<typeof us
 
 describe("TierList コンポーネント", () => {
   let mockGetPokemonsByLocation: jest.Mock;
+  let mockGetPlacedPokemonIds: jest.Mock;
   let mockHandleMovePokemon: jest.Mock;
   let mockHandleResetTiers: jest.Mock;
   let mockHandleDeletePokemon: jest.Mock;
 
   beforeEach(() => {
     mockGetPokemonsByLocation = jest.fn();
+    mockGetPlacedPokemonIds = jest.fn();
     mockHandleMovePokemon = jest.fn();
     mockHandleResetTiers = jest.fn();
     mockHandleDeletePokemon = jest.fn();
@@ -54,9 +56,13 @@ describe("TierList コンポーネント", () => {
       return [];
     });
 
+    // デフォルトでは配置済みポケモンはなし
+    mockGetPlacedPokemonIds.mockReturnValue(new Set());
+
     mockUseTierManagement.mockReturnValue({
       assignments: [],
       getPokemonsByLocation: mockGetPokemonsByLocation,
+      getPlacedPokemonIds: mockGetPlacedPokemonIds,
       handleMovePokemon: mockHandleMovePokemon,
       handleResetTiers: mockHandleResetTiers,
       handleDeletePokemon: mockHandleDeletePokemon,
