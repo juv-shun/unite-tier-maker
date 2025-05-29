@@ -10,7 +10,7 @@ import {
 } from "../styles/DraggablePokemon.styles";
 
 interface DraggablePokemonProps {
-  pokemon: Pokemon & { assignmentId?: string; isFromUnassignedArea?: boolean };
+  pokemon: Pokemon & { assignmentId?: string; isFromUnassignedArea?: boolean; isPlacedElsewhere?: boolean };
   index: number;
   tierLocation: string;
   onMove: (
@@ -129,7 +129,13 @@ const DraggablePokemon: React.FC<DraggablePokemonProps> = ({
       onClick={handleClick}
     >
       <PokemonWrapper isSelected={isSelected}>
-        <PokemonImage src={pokemon.imageUrl} alt={pokemon.name} title={pokemon.name} />
+        <PokemonImage 
+          src={pokemon.imageUrl} 
+          alt={pokemon.name} 
+          title={pokemon.name}
+          isPlacedElsewhere={pokemon.isPlacedElsewhere}
+          isInUnassignedArea={tierLocation === TierId.UNASSIGNED}
+        />
         {isSelected && tierLocation !== TierId.UNASSIGNED && (
           <RemoveButton onClick={handleRemove}>×</RemoveButton>
         )}

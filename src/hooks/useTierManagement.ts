@@ -315,6 +315,18 @@ export const useTierManagement = () => {
     });
   }, []);
 
+  // 指定されたポケモンIDが未配置エリア以外のいずれかのTierに配置されているかチェックする関数
+  const isPlacedInAnyTier = useCallback(
+    (pokemonId: string): boolean => {
+      return assignments.some(
+        (assignment) => 
+          assignment.pokemonId === pokemonId && 
+          assignment.location !== TierId.UNASSIGNED
+      );
+    },
+    [assignments]
+  );
+
   return {
     assignments, // フェーズ2以降で内部状態にするか検討
     getPokemonsByLocation,
@@ -322,5 +334,6 @@ export const useTierManagement = () => {
     handleResetTiers,
     handleDeletePokemon,
     saveAssignmentsToStorage, // 外部から直接localStorageに保存できるようにエクスポート
+    isPlacedInAnyTier, // 新機能: 配置状態判定関数
   };
 };

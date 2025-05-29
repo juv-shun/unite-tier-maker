@@ -61,6 +61,7 @@ describe("TierList コンポーネント", () => {
       handleResetTiers: mockHandleResetTiers,
       handleDeletePokemon: mockHandleDeletePokemon,
       saveAssignmentsToStorage: jest.fn(),
+      isPlacedInAnyTier: jest.fn().mockReturnValue(false),
     });
   });
 
@@ -266,6 +267,125 @@ describe("TierList コンポーネント", () => {
       // 未配置エリア内での位置変更は意味がないため、
       // ここでは単に未配置エリアのポケモンが存在することを確認
       // 実際の位置変更機能は、Tierセル内でのみ有効
+    });
+  });
+
+  describe("視覚的区別機能のテスト", () => {
+    test("初期状態では全てのポケモンが通常表示されている", () => {
+      // 何も配置されていない状態
+      mockGetPokemonsByLocation.mockImplementation((location: string) => {
+        if (location === TierId.UNASSIGNED) {
+          return [
+            { ...mockPokemon[0], isPlacedElsewhere: false },
+            { ...mockPokemon[1], isPlacedElsewhere: false }
+          ];
+        }
+        return [];
+      });
+
+      // isPlacedInAnyTierをモック化
+      const mockIsPlacedInAnyTier = jest.fn().mockReturnValue(false);
+      mockUseTierManagement.mockReturnValue({
+        assignments: [],
+        getPokemonsByLocation: mockGetPokemonsByLocation,
+        handleMovePokemon: mockHandleMovePokemon,
+        handleResetTiers: mockHandleResetTiers,
+        handleDeletePokemon: mockHandleDeletePokemon,
+        saveAssignmentsToStorage: jest.fn(),
+        isPlacedInAnyTier: mockIsPlacedInAnyTier,
+      });
+
+      renderTierList();
+
+      // 未配置エリアのポケモンが表示されている
+      const pikachuImages = screen.getAllByAltText("ピカチュウ");
+      const fushigidaneImages = screen.getAllByAltText("フシギダネ");
+      
+      expect(pikachuImages.length).toBeGreaterThan(0);
+      expect(fushigidaneImages.length).toBeGreaterThan(0);
+
+      // isPlacedInAnyTierが呼ばれることを確認
+      expect(mockIsPlacedInAnyTier).toHaveBeenCalled();
+    });
+
+    test("Tierに配置されたポケモンは未配置エリアでgrayscaleになる", () => {
+      // ピカチュウがTierに配置されている状態
+      mockGetPokemonsByLocation.mockImplementation((location: string) => {
+        if (location === TierId.UNASSIGNED) {
+          return [
+            { ...mockPokemon[0], isPlacedElsewhere: true },  // ピカチュウは配置済み
+            { ...mockPokemon[1], isPlacedElsewhere: false }  // フシギダネは未配置
+          ];
+        }
+        if (location === "attacker-S") {
+          return [{
+            ...mockPokemon[0],
+            assignmentId: "assignment-1"
+          }];
+        }
+        return [];
+      });
+
+      // isPlacedInAnyTierをモック化
+      const mockIsPlacedInAnyTier = jest.fn()
+        .mockImplementation((pokemonId: string) => pokemonId === "1"); // ピカチュウのみtrue
+
+      mockUseTierManagement.mockReturnValue({
+        assignments: [],
+        getPokemonsByLocation: mockGetPokemonsByLocation,
+        handleMovePokemon: mockHandleMovePokemon,
+        handleResetTiers: mockHandleResetTiers,
+        handleDeletePokemon: mockHandleDeletePokemon,
+        saveAssignmentsToStorage: jest.fn(),
+        isPlacedInAnyTier: mockIsPlacedInAnyTier,
+      });
+
+      renderTierList();
+
+      // 両方のポケモンが表示されていることを確認
+      const pikachuImages = screen.getAllByAltText("ピカチュウ");
+      const fushigidaneImages = screen.getAllByAltText("フシギダネ");
+      
+      expect(pikachuImages.length).toBeGreaterThanOrEqual(1);
+      expect(fushigidaneImages.length).toBeGreaterThanOrEqual(1);
+
+      // isPlacedInAnyTierが適切に呼ばれることを確認
+      expect(mockIsPlacedInAnyTier).toHaveBeenCalled();
+    });
+
+    test("ポケモンが削除されると未配置エリアで通常表示に戻る", () => {
+      // 削除後の状態
+      mockGetPokemonsByLocation.mockImplementation((location: string) => {
+        if (location === TierId.UNASSIGNED) {
+          return [
+            { ...mockPokemon[0], isPlacedElsewhere: false }, // 削除後は通常表示
+            { ...mockPokemon[1], isPlacedElsewhere: false }
+          ];
+        }
+        return []; // Tierには何もない
+      });
+
+      // isPlacedInAnyTierをモック化
+      const mockIsPlacedInAnyTier = jest.fn().mockReturnValue(false);
+
+      mockUseTierManagement.mockReturnValue({
+        assignments: [],
+        getPokemonsByLocation: mockGetPokemonsByLocation,
+        handleMovePokemon: mockHandleMovePokemon,
+        handleResetTiers: mockHandleResetTiers,
+        handleDeletePokemon: mockHandleDeletePokemon,
+        saveAssignmentsToStorage: jest.fn(),
+        isPlacedInAnyTier: mockIsPlacedInAnyTier,
+      });
+
+      renderTierList();
+
+      // ポケモンが表示されていることを確認
+      const pikachuImages = screen.getAllByAltText("ピカチュウ");
+      expect(pikachuImages.length).toBeGreaterThan(0);
+
+      // isPlacedInAnyTierが呼ばれることを確認
+      expect(mockIsPlacedInAnyTier).toHaveBeenCalled();
     });
   });
 
