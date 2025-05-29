@@ -23,10 +23,16 @@ export const PokemonContainer = styled.div<{
     background-color 0.2s ease;
 `;
 
-export const PokemonImage = styled.img`
+export const PokemonImage = styled.img<{ isPlacedElsewhere?: boolean; isInUnassignedArea?: boolean }>`
   width: 100%;
   height: 100%;
   object-fit: contain;
+  filter: ${(props) => 
+    props.isInUnassignedArea && props.isPlacedElsewhere 
+      ? "grayscale(100%)" 
+      : "none"
+  };
+  transition: filter 0.2s ease;
 `;
 
 export const RemoveButton = styled.div`
