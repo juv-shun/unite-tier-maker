@@ -23,16 +23,10 @@ export const PokemonContainer = styled.div<{
     background-color 0.2s ease;
 `;
 
-export const PokemonImage = styled.img<{ isPlacedElsewhere?: boolean; isInUnassignedArea?: boolean }>`
+export const PokemonImage = styled.img`
   width: 100%;
   height: 100%;
   object-fit: contain;
-  filter: ${(props) => 
-    props.isInUnassignedArea && props.isPlacedElsewhere 
-      ? "grayscale(100%)" 
-      : "none"
-  };
-  transition: filter 0.2s ease;
 `;
 
 export const RemoveButton = styled.div`
@@ -60,4 +54,22 @@ export const RemoveButton = styled.div`
 export const PokemonWrapper = styled.div<{ isSelected?: boolean }>`
   position: relative;
   display: inline-block;
+`;
+
+export const PlacedMark = styled.div`
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 16px;
+  height: 16px;
+  background-color: #4CAF50;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: bold;
+  z-index: 10;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 `;

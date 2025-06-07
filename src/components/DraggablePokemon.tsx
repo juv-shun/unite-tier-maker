@@ -7,6 +7,7 @@ import {
   PokemonImage,
   RemoveButton,
   PokemonWrapper,
+  PlacedMark,
 } from "../styles/DraggablePokemon.styles";
 
 interface DraggablePokemonProps {
@@ -133,9 +134,10 @@ const DraggablePokemon: React.FC<DraggablePokemonProps> = ({
           src={pokemon.imageUrl} 
           alt={pokemon.name} 
           title={pokemon.name}
-          isPlacedElsewhere={pokemon.isPlacedElsewhere}
-          isInUnassignedArea={tierLocation === TierId.UNASSIGNED}
         />
+        {tierLocation === TierId.UNASSIGNED && pokemon.isPlacedElsewhere && (
+          <PlacedMark>✓</PlacedMark>
+        )}
         {isSelected && tierLocation !== TierId.UNASSIGNED && (
           <RemoveButton onClick={handleRemove}>×</RemoveButton>
         )}

@@ -27,7 +27,7 @@ describe("DraggablePokemon - 視覚的区別機能", () => {
   });
 
   describe("未配置エリアでの視覚的区別", () => {
-    test("配置済みポケモンはgrayscaleフィルターが適用される", () => {
+    test("配置済みポケモンには済マークが表示される", () => {
       render(
         <DraggablePokemon
           pokemon={{ ...mockPokemon, isPlacedElsewhere: true }}
@@ -38,11 +38,11 @@ describe("DraggablePokemon - 視覚的区別機能", () => {
         />
       );
 
-      const pokemonImage = screen.getByAltText("ピカチュウ");
-      expect(pokemonImage).toHaveStyle({ filter: "grayscale(100%)" });
+      const placedMark = screen.getByText("✓");
+      expect(placedMark).toBeInTheDocument();
     });
 
-    test("未配置ポケモンは通常表示される", () => {
+    test("未配置ポケモンには済マークが表示されない", () => {
       render(
         <DraggablePokemon
           pokemon={{ ...mockPokemon, isPlacedElsewhere: false }}
@@ -53,11 +53,11 @@ describe("DraggablePokemon - 視覚的区別機能", () => {
         />
       );
 
-      const pokemonImage = screen.getByAltText("ピカチュウ");
-      expect(pokemonImage).not.toHaveStyle({ filter: "grayscale(100%)" });
+      const placedMark = screen.queryByText("✓");
+      expect(placedMark).not.toBeInTheDocument();
     });
 
-    test("Tier内のポケモンには視覚的区別が適用されない", () => {
+    test("Tier内のポケモンには済マークが表示されない", () => {
       render(
         <DraggablePokemon
           pokemon={{ ...mockPokemon, isPlacedElsewhere: true }}
@@ -68,9 +68,9 @@ describe("DraggablePokemon - 視覚的区別機能", () => {
         />
       );
 
-      const pokemonImage = screen.getByAltText("ピカチュウ");
-      // Tier内では isPlacedElsewhere が true でも grayscale は適用されない
-      expect(pokemonImage).not.toHaveStyle({ filter: "grayscale(100%)" });
+      const placedMark = screen.queryByText("✓");
+      // Tier内では isPlacedElsewhere が true でも済マークは表示されない
+      expect(placedMark).not.toBeInTheDocument();
     });
   });
 
@@ -87,8 +87,8 @@ describe("DraggablePokemon - 視覚的区別機能", () => {
         />
       );
 
-      const pokemonImage = screen.getByAltText("ピカチュウ");
-      expect(pokemonImage).toHaveStyle({ filter: "grayscale(100%)" });
+      const placedMark = screen.getByText("✓");
+      expect(placedMark).toBeInTheDocument();
     });
 
     test("初期状態で未配置のポケモンは通常表示", () => {
@@ -102,13 +102,13 @@ describe("DraggablePokemon - 視覚的区別機能", () => {
         />
       );
 
-      const pokemonImage = screen.getByAltText("ピカチュウ");
-      expect(pokemonImage).not.toHaveStyle({ filter: "grayscale(100%)" });
+      const placedMark = screen.queryByText("✓");
+      expect(placedMark).not.toBeInTheDocument();
     });
   });
 
   describe("プロパティの処理", () => {
-    test("isPlacedElsewhere プロパティが未定義の場合は通常表示", () => {
+    test("isPlacedElsewhere プロパティが未定義の場合は済マークが表示されない", () => {
       render(
         <DraggablePokemon
           pokemon={{ ...mockPokemon, isPlacedElsewhere: undefined }}
@@ -119,11 +119,11 @@ describe("DraggablePokemon - 視覚的区別機能", () => {
         />
       );
 
-      const pokemonImage = screen.getByAltText("ピカチュウ");
-      expect(pokemonImage).not.toHaveStyle({ filter: "grayscale(100%)" });
+      const placedMark = screen.queryByText("✓");
+      expect(placedMark).not.toBeInTheDocument();
     });
 
-    test("未配置エリア以外では isPlacedElsewhere の値に関係なく通常表示", () => {
+    test("未配置エリア以外では isPlacedElsewhere の値に関係なく済マークが表示されない", () => {
       render(
         <DraggablePokemon
           pokemon={{ ...mockPokemon, isPlacedElsewhere: true }}
@@ -134,8 +134,8 @@ describe("DraggablePokemon - 視覚的区別機能", () => {
         />
       );
 
-      const pokemonImage = screen.getByAltText("ピカチュウ");
-      expect(pokemonImage).not.toHaveStyle({ filter: "grayscale(100%)" });
+      const placedMark = screen.queryByText("✓");
+      expect(placedMark).not.toBeInTheDocument();
     });
   });
 });
