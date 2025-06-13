@@ -477,4 +477,10 @@ export const pokemonList: Pokemon[] = [
     imageUrl:
       "https://tiermaker.com/images/chart/chart/pokemon-unite-tier-list--452797/22-eldegossjpg.png",
   },
+  {
+    id: "alcremie",
+    name: "マホイップ",
+    imageUrl:
+      "https://tiermaker.com/images/chart/chart/pokemon-unite-tier-list--452797/zzzzz-1749786263dcc2e8d8-4403-4e85-8244-61adee5b97bb.png",
+  },
 ];
