@@ -38,22 +38,49 @@ export const useTierManagement = () => {
   // 初期状態を設定
   const initialAssignments = useMemo(() => {
     console.log("初期状態の設定を開始");
+    let assignmentsToInitialize: PokemonAssignment[] = [];
     const savedAssignments = getSavedAssignments();
+
     if (savedAssignments && savedAssignments.length > 0) {
       console.log("保存された状態を使用します");
-      return savedAssignments;
+      assignmentsToInitialize = [...savedAssignments];
+    } else {
+      console.log("新しい初期状態を作成します（保存データなし）");
+      // 保存された状態がない場合は初期状態を作成
+      assignmentsToInitialize = pokemonList.map((pokemon, index) => ({
+        id: generateAssignmentId(),
+        pokemonId: pokemon.id,
+        location: TierId.UNASSIGNED,
+        position: index,
+        isFromUnassignedArea: true,
+      }));
     }
 
-    console.log("新しい初期状態を作成します");
-    // 保存された状態がない場合は初期状態を作成
-    return pokemonList.map((pokemon, index) => ({
-      id: generateAssignmentId(),
-      pokemonId: pokemon.id,
-      location: TierId.UNASSIGNED, // 初期状態ではunassigned
-      position: index,
-      isFromUnassignedArea: true, // 未配置エリアから来たポケモンかどうかのフラグ
-    }));
-  }, [getSavedAssignments]);
+    // pokemonListに存在するが、assignmentsToInitializeに存在しないポケモンを未配置として追加
+    const existingPokemonIds = new Set(assignmentsToInitialize.map(a => a.pokemonId));
+    pokemonList.forEach((pokemon, index) => {
+      if (!existingPokemonIds.has(pokemon.id)) {
+        console.log(`新しいポケモン ${pokemon.name} を未配置に追加します`);
+        assignmentsToInitialize.push({
+          id: generateAssignmentId(),
+          pokemonId: pokemon.id,
+          location: TierId.UNASSIGNED,
+          position: pokemonOriginalOrderMap[pokemon.id] ?? index, // 元の順序を維持、なければ末尾
+          isFromUnassignedArea: true,
+        });
+      }
+    });
+
+    // 未配置エリアのポケモンの順序を pokemonList の順序に合わせる
+    // (TierId.UNASSIGNED のポケモンのみを対象とし、pokemonOriginalOrderMap を使ってソート)
+    const unassignedToSort = assignmentsToInitialize.filter(a => a.location === TierId.UNASSIGNED);
+    const otherAssignments = assignmentsToInitialize.filter(a => a.location !== TierId.UNASSIGNED);
+
+    unassignedToSort.sort((a, b) => (pokemonOriginalOrderMap[a.pokemonId] ?? Infinity) - (pokemonOriginalOrderMap[b.pokemonId] ?? Infinity));
+
+    // ソートされた未配置ポケモンを他のポケモンと結合
+    return [...otherAssignments, ...unassignedToSort];
+  }, [getSavedAssignments, pokemonOriginalOrderMap]);
 
   // assignmentIdを追加して、同じポケモンが複数の場所に配置できるようにする
   const [assignments, setAssignments] = useState<PokemonAssignment[]>(initialAssignments);
