@@ -64,6 +64,12 @@ export const pokemonList: Pokemon[] = [
       "https://tiermaker.com/images/chart/chart/pokemon-unite-tier-list--452797/13-gardevoirjpg.png",
   },
   {
+    id: "latios",
+    name: "ラティオス",
+    imageUrl:
+      "https://tiermaker.com/images/chart/chart/pokemon-unite-tier-list--452797/zzzzz-1752879096e11f4eab-2b2f-4c54-a914-c1b609177011.png",
+  },
+  {
     id: "chandelure",
     name: "シャンデラ",
     imageUrl:
@@ -458,6 +464,12 @@ export const pokemonList: Pokemon[] = [
     name: "ヤミラミ",
     imageUrl:
       "https://tiermaker.com/images/chart/chart/pokemon-unite-tier-list--452797/zzzzz-1664205924a2f3acf6-f547-4975-b3e5-04da31a6b65ajpeg.png",
+  },
+  {
+    id: "latias",
+    name: "ラティアス",
+    imageUrl:
+      "https://tiermaker.com/images/chart/chart/pokemon-unite-tier-list--452797/zzzzz-175287909687b82aa5-a2ef-487c-bd69-c2bf33a7e5bf.png",
   },
   {
     id: "hoopa",
