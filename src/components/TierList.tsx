@@ -8,7 +8,6 @@ import { usePositionLabels } from "../hooks/usePositionLabels";
 import { useTierLabels } from "../hooks/useTierLabels";
 import {
   ButtonContainer,
-  ColumnHeader,
   EmptyHeaderCell,
   ResetButton,
   TierListContainer,
