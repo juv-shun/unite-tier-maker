@@ -37,6 +37,12 @@ const TierList: React.FC = () => {
   } = usePositionLabels();
   const { updateTierLabel, getTierLabel, resetToDefaults: resetTierLabels } = useTierLabels();
 
+  const handleResetAll = () => {
+    handleResetTiers();
+    resetPositionLabels();
+    resetTierLabels();
+  };
+
   // useMemoを使用してフィルタリングされたポケモンをキャッシュ
   const unassignedPokemon = useMemo(
     () => getPokemonsByLocation(TierId.UNASSIGNED),
@@ -158,9 +164,7 @@ const TierList: React.FC = () => {
         </UnassignedContainer>
 
         <ButtonContainer>
-          <ResetButton onClick={handleResetTiers}>リセット</ResetButton>
-          <ResetButton onClick={resetPositionLabels}>行ラベルリセット</ResetButton>
-          <ResetButton onClick={resetTierLabels}>列ラベルリセット</ResetButton>
+          <ResetButton onClick={handleResetAll}>全リセット</ResetButton>
         </ButtonContainer>
       </TierListContainer>
     </DndProvider>
