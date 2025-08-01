@@ -7,7 +7,9 @@ import { TierId } from "../../types";
 
 // react-dndをモック
 jest.mock("react-dnd", () => ({
-  DndProvider: ({ children }: { children: React.ReactNode }) => <div data-testid="dnd-provider">{children}</div>,
+  DndProvider: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="dnd-provider">{children}</div>
+  ),
   useDrag: () => [{ isDragging: false }, jest.fn(), jest.fn()],
   useDrop: () => [{ isOver: false, canDrop: true }, jest.fn()],
 }));
@@ -80,13 +82,13 @@ describe("TierList コンポーネント", () => {
       // 未配置エリアのポケモンが表示されていることを確認
       const pikachuImages = screen.getAllByAltText("ピカチュウ");
       const fushigidaneImages = screen.getAllByAltText("フシギダネ");
-      
+
       expect(pikachuImages.length).toBeGreaterThan(0);
       expect(fushigidaneImages.length).toBeGreaterThan(0);
 
       // ドラッグ&ドロップのテストはreact-dndをモックしているため、
       // 実際のDnD操作はテストできないが、ドロップ先のTierセルが存在することを確認
-      const tierCell = screen.getByTestId('tier-cell-attacker-S');
+      const tierCell = screen.getByTestId("tier-cell-attacker-S");
       expect(tierCell).toBeInTheDocument();
 
       // handleMovePokemonが存在することを確認
@@ -100,10 +102,12 @@ describe("TierList コンポーネント", () => {
           return mockPokemon; // 移動後も残っている
         }
         if (location === "attacker-S") {
-          return [{
-            ...mockPokemon[0],
-            assignmentId: "assignment-1"
-          }]; // ティアにもコピーされている
+          return [
+            {
+              ...mockPokemon[0],
+              assignmentId: "assignment-1",
+            },
+          ]; // ティアにもコピーされている
         }
         return [];
       });
@@ -124,10 +128,12 @@ describe("TierList コンポーネント", () => {
           return [];
         }
         if (location === "attacker-S") {
-          return [{
-            ...mockPokemon[0],
-            assignmentId: "assignment-1"
-          }];
+          return [
+            {
+              ...mockPokemon[0],
+              assignmentId: "assignment-1",
+            },
+          ];
         }
         return [];
       });
@@ -160,10 +166,12 @@ describe("TierList コンポーネント", () => {
           return [mockPokemon[0]]; // 未配置エリアにピカチュウ
         }
         if (location === "attacker-S") {
-          return [{
-            ...mockPokemon[0],
-            assignmentId: "assignment-1"
-          }]; // S tierにも既にピカチュウ
+          return [
+            {
+              ...mockPokemon[0],
+              assignmentId: "assignment-1",
+            },
+          ]; // S tierにも既にピカチュウ
         }
         return [];
       });
@@ -173,7 +181,7 @@ describe("TierList コンポーネント", () => {
       // 複数のピカチュウが存在することを確認（未配置エリア + Tier）
       const pikachuImages = screen.getAllByAltText("ピカチュウ");
       expect(pikachuImages.length).toBeGreaterThanOrEqual(2);
-      
+
       // DraggablePokemonコンポーネントのcanDropロジックで重複を防ぐ機能があることを前提とする
       // 実際のドロップテストはモックのため実行できない
     });
@@ -187,10 +195,12 @@ describe("TierList コンポーネント", () => {
           return [];
         }
         if (location === "attacker-S") {
-          return [{
-            ...mockPokemon[0],
-            assignmentId: "assignment-1"
-          }];
+          return [
+            {
+              ...mockPokemon[0],
+              assignmentId: "assignment-1",
+            },
+          ];
         }
         return [];
       });
@@ -228,7 +238,7 @@ describe("TierList コンポーネント", () => {
         if (location === "attacker-S") {
           return [
             { ...mockPokemon[0], assignmentId: "assignment-1" },
-            { ...mockPokemon[1], assignmentId: "assignment-2" }
+            { ...mockPokemon[1], assignmentId: "assignment-2" },
           ];
         }
         return [];
@@ -277,7 +287,7 @@ describe("TierList コンポーネント", () => {
         if (location === TierId.UNASSIGNED) {
           return [
             { ...mockPokemon[0], isPlacedElsewhere: false },
-            { ...mockPokemon[1], isPlacedElsewhere: false }
+            { ...mockPokemon[1], isPlacedElsewhere: false },
           ];
         }
         return [];
@@ -300,7 +310,7 @@ describe("TierList コンポーネント", () => {
       // 未配置エリアのポケモンが表示されている
       const pikachuImages = screen.getAllByAltText("ピカチュウ");
       const fushigidaneImages = screen.getAllByAltText("フシギダネ");
-      
+
       expect(pikachuImages.length).toBeGreaterThan(0);
       expect(fushigidaneImages.length).toBeGreaterThan(0);
 
@@ -313,21 +323,24 @@ describe("TierList コンポーネント", () => {
       mockGetPokemonsByLocation.mockImplementation((location: string) => {
         if (location === TierId.UNASSIGNED) {
           return [
-            { ...mockPokemon[0], isPlacedElsewhere: true },  // ピカチュウは配置済み
-            { ...mockPokemon[1], isPlacedElsewhere: false }  // フシギダネは未配置
+            { ...mockPokemon[0], isPlacedElsewhere: true }, // ピカチュウは配置済み
+            { ...mockPokemon[1], isPlacedElsewhere: false }, // フシギダネは未配置
           ];
         }
         if (location === "attacker-S") {
-          return [{
-            ...mockPokemon[0],
-            assignmentId: "assignment-1"
-          }];
+          return [
+            {
+              ...mockPokemon[0],
+              assignmentId: "assignment-1",
+            },
+          ];
         }
         return [];
       });
 
       // isPlacedInAnyTierをモック化
-      const mockIsPlacedInAnyTier = jest.fn()
+      const mockIsPlacedInAnyTier = jest
+        .fn()
         .mockImplementation((pokemonId: string) => pokemonId === "1"); // ピカチュウのみtrue
 
       mockUseTierManagement.mockReturnValue({
@@ -345,7 +358,7 @@ describe("TierList コンポーネント", () => {
       // 両方のポケモンが表示されていることを確認
       const pikachuImages = screen.getAllByAltText("ピカチュウ");
       const fushigidaneImages = screen.getAllByAltText("フシギダネ");
-      
+
       expect(pikachuImages.length).toBeGreaterThanOrEqual(1);
       expect(fushigidaneImages.length).toBeGreaterThanOrEqual(1);
 
@@ -359,7 +372,7 @@ describe("TierList コンポーネント", () => {
         if (location === TierId.UNASSIGNED) {
           return [
             { ...mockPokemon[0], isPlacedElsewhere: false }, // 削除後は通常表示
-            { ...mockPokemon[1], isPlacedElsewhere: false }
+            { ...mockPokemon[1], isPlacedElsewhere: false },
           ];
         }
         return []; // Tierには何もない
@@ -392,19 +405,19 @@ describe("TierList コンポーネント", () => {
   describe("基本機能のテスト", () => {
     test("TierListコンポーネントが正しくレンダリングされる", () => {
       renderTierList();
-      
+
       // タイトルが表示されている
       expect(screen.getByText("Pokemon Unite Tier Maker")).toBeInTheDocument();
-      
+
       // リセットボタンが表示されている
       expect(screen.getByText("リセット")).toBeInTheDocument();
-      
+
       // 各ティアのヘッダーが表示されている
       expect(screen.getByText("S")).toBeInTheDocument();
       expect(screen.getByText("A")).toBeInTheDocument();
       expect(screen.getByText("B")).toBeInTheDocument();
       expect(screen.getByText("C")).toBeInTheDocument();
-      
+
       // ポジションラベルが表示されている
       expect(screen.getByText("上キャリー")).toBeInTheDocument();
       expect(screen.getByText("上学習")).toBeInTheDocument();
@@ -412,13 +425,13 @@ describe("TierList コンポーネント", () => {
       expect(screen.getByText("下キャリー")).toBeInTheDocument();
       expect(screen.getByText("下学習")).toBeInTheDocument();
     });
-    
+
     test("リセットボタンをクリックするとhandleResetTiersが呼ばれる", () => {
       renderTierList();
-      
+
       const resetButton = screen.getByText("リセット");
       fireEvent.click(resetButton);
-      
+
       expect(mockHandleResetTiers).toHaveBeenCalled();
     });
   });

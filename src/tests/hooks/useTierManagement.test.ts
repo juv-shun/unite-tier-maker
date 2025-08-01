@@ -39,12 +39,7 @@ describe("useTierManagement - 配置状態判定ロジック", () => {
 
       // ポケモンを S Tier に配置
       act(() => {
-        result.current.handleMovePokemon(
-          { pokemonId: "pikachu" },
-          "attacker-S",
-          0,
-          false
-        );
+        result.current.handleMovePokemon({ pokemonId: "pikachu" }, "attacker-S", 0, false);
       });
 
       // isPlacedInAnyTier関数を使ってpikachu が配置されているかチェック
@@ -65,21 +60,11 @@ describe("useTierManagement - 配置状態判定ロジック", () => {
 
       // ポケモンを複数のTierに配置
       act(() => {
-        result.current.handleMovePokemon(
-          { pokemonId: "pikachu" },
-          "attacker-S",
-          0,
-          false
-        );
+        result.current.handleMovePokemon({ pokemonId: "pikachu" }, "attacker-S", 0, false);
       });
 
       act(() => {
-        result.current.handleMovePokemon(
-          { pokemonId: "pikachu" },
-          "attacker-A",
-          0,
-          false
-        );
+        result.current.handleMovePokemon({ pokemonId: "pikachu" }, "attacker-A", 0, false);
       });
 
       const isPlaced = result.current.isPlacedInAnyTier("pikachu");
@@ -92,12 +77,7 @@ describe("useTierManagement - 配置状態判定ロジック", () => {
       // 初期状態では全てのポケモンが未配置エリアにある
       // ポケモンをTierに配置（コピー作成）
       act(() => {
-        result.current.handleMovePokemon(
-          { pokemonId: "pikachu" },
-          "attacker-S",
-          0,
-          false
-        );
+        result.current.handleMovePokemon({ pokemonId: "pikachu" }, "attacker-S", 0, false);
       });
 
       // 未配置エリアにも残り、Tierにも配置されている状態
@@ -110,12 +90,7 @@ describe("useTierManagement - 配置状態判定ロジック", () => {
 
       // ポケモンをTierに配置
       act(() => {
-        result.current.handleMovePokemon(
-          { pokemonId: "pikachu" },
-          "attacker-S",
-          0,
-          false
-        );
+        result.current.handleMovePokemon({ pokemonId: "pikachu" }, "attacker-S", 0, false);
       });
 
       // 配置されていることを確認

@@ -57,7 +57,7 @@ export const useTierManagement = () => {
     }
 
     // pokemonListに存在するが、assignmentsToInitializeに存在しないポケモンを未配置として追加
-    const existingPokemonIds = new Set(assignmentsToInitialize.map(a => a.pokemonId));
+    const existingPokemonIds = new Set(assignmentsToInitialize.map((a) => a.pokemonId));
     pokemonList.forEach((pokemon, index) => {
       if (!existingPokemonIds.has(pokemon.id)) {
         console.log(`新しいポケモン ${pokemon.name} を未配置に追加します`);
@@ -73,10 +73,18 @@ export const useTierManagement = () => {
 
     // 未配置エリアのポケモンの順序を pokemonList の順序に合わせる
     // (TierId.UNASSIGNED のポケモンのみを対象とし、pokemonOriginalOrderMap を使ってソート)
-    const unassignedToSort = assignmentsToInitialize.filter(a => a.location === TierId.UNASSIGNED);
-    const otherAssignments = assignmentsToInitialize.filter(a => a.location !== TierId.UNASSIGNED);
+    const unassignedToSort = assignmentsToInitialize.filter(
+      (a) => a.location === TierId.UNASSIGNED
+    );
+    const otherAssignments = assignmentsToInitialize.filter(
+      (a) => a.location !== TierId.UNASSIGNED
+    );
 
-    unassignedToSort.sort((a, b) => (pokemonOriginalOrderMap[a.pokemonId] ?? Infinity) - (pokemonOriginalOrderMap[b.pokemonId] ?? Infinity));
+    unassignedToSort.sort(
+      (a, b) =>
+        (pokemonOriginalOrderMap[a.pokemonId] ?? Infinity) -
+        (pokemonOriginalOrderMap[b.pokemonId] ?? Infinity)
+    );
 
     // ソートされた未配置ポケモンを他のポケモンと結合
     return [...otherAssignments, ...unassignedToSort];
@@ -346,9 +354,8 @@ export const useTierManagement = () => {
   const isPlacedInAnyTier = useCallback(
     (pokemonId: string): boolean => {
       return assignments.some(
-        (assignment) => 
-          assignment.pokemonId === pokemonId && 
-          assignment.location !== TierId.UNASSIGNED
+        (assignment) =>
+          assignment.pokemonId === pokemonId && assignment.location !== TierId.UNASSIGNED
       );
     },
     [assignments]

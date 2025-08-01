@@ -4,11 +4,11 @@ import { HTML5Backend } from "react-dnd-html5-backend";
 import { TIERS } from "../constants/tiers";
 import { Pokemon, Position, POSITIONS } from "../data/pokemon";
 import { useTierManagement } from "../hooks/useTierManagement";
+import { usePositionLabels } from "../hooks/usePositionLabels";
 import {
   ButtonContainer,
   ColumnHeader,
   EmptyHeaderCell,
-  LabelCell,
   ResetButton,
   TierListContainer,
   TierListContent,
@@ -19,10 +19,18 @@ import {
 import { TierId } from "../types";
 import DraggablePokemon from "./DraggablePokemon";
 import TierRow from "./TierRow";
+import EditableLabel from "./EditableLabel";
 
 const TierList: React.FC = () => {
-  const { getPokemonsByLocation, handleMovePokemon, handleResetTiers, handleDeletePokemon, isPlacedInAnyTier } =
-    useTierManagement();
+  const {
+    getPokemonsByLocation,
+    handleMovePokemon,
+    handleResetTiers,
+    handleDeletePokemon,
+    isPlacedInAnyTier,
+  } = useTierManagement();
+
+  const { updatePositionLabel, getPositionLabel, resetToDefaults } = usePositionLabels();
 
   // useMemoを使用してフィルタリングされたポケモンをキャッシュ
   const unassignedPokemon = useMemo(
@@ -88,7 +96,11 @@ const TierList: React.FC = () => {
           {POSITIONS.map((position) => (
             <div key={position.id} style={{ display: "flex", marginBottom: 5 }}>
               {/* 行ラベル */}
-              <LabelCell backgroundColor={positionColors[position.id]}>{position.name}</LabelCell>
+              <EditableLabel
+                value={getPositionLabel(position.id)}
+                backgroundColor={positionColors[position.id]}
+                onSave={(newName) => updatePositionLabel(position.id, newName)}
+              />
 
               {/* 各Tierセル */}
               {TIERS.map((tier) => (
@@ -114,7 +126,7 @@ const TierList: React.FC = () => {
                 key={pokemon.id}
                 pokemon={{
                   ...pokemon,
-                  isPlacedElsewhere: isPlacedInAnyTier(pokemon.id)
+                  isPlacedElsewhere: isPlacedInAnyTier(pokemon.id),
                 }}
                 tierLocation={TierId.UNASSIGNED}
                 index={index}
@@ -138,6 +150,7 @@ const TierList: React.FC = () => {
 
         <ButtonContainer>
           <ResetButton onClick={handleResetTiers}>リセット</ResetButton>
+          <ResetButton onClick={resetToDefaults}>ラベルリセット</ResetButton>
         </ButtonContainer>
       </TierListContainer>
     </DndProvider>

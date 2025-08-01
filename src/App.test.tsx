@@ -5,7 +5,9 @@ import App from "./App";
 
 // react-dndをモック
 jest.mock("react-dnd", () => ({
-  DndProvider: ({ children }: { children: React.ReactNode }) => <div data-testid="dnd-provider">{children}</div>,
+  DndProvider: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="dnd-provider">{children}</div>
+  ),
   useDrag: () => [{ isDragging: false }, jest.fn(), jest.fn()],
   useDrop: () => [{ isOver: false, canDrop: true }, jest.fn()],
 }));

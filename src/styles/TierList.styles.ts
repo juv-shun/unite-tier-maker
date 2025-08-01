@@ -129,6 +129,7 @@ export const ResetButton = styled.button`
   border: none;
   border-radius: 4px;
   cursor: pointer;
+  margin: 0 5px;
   &:hover {
     background-color: #d32f2f;
   }

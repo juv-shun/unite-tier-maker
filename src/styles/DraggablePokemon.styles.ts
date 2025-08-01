@@ -62,7 +62,7 @@ export const PlacedMark = styled.div`
   right: 2px;
   width: 16px;
   height: 16px;
-  background-color: #4CAF50;
+  background-color: #4caf50;
   color: white;
   border-radius: 50%;
   display: flex;
