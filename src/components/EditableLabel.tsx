@@ -1,11 +1,12 @@
 import React, { useState, useRef, useEffect } from "react";
-import { LabelCell } from "../styles/TierList.styles";
+import { LabelCell, ColumnHeader } from "../styles/TierList.styles";
 
 interface EditableLabelProps {
   value: string;
   backgroundColor: string;
   onSave: (newValue: string) => void;
   onCancel?: () => void;
+  variant?: "label" | "column";
 }
 
 const EditableLabel: React.FC<EditableLabelProps> = ({
@@ -13,6 +14,7 @@ const EditableLabel: React.FC<EditableLabelProps> = ({
   backgroundColor,
   onSave,
   onCancel,
+  variant = "label",
 }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState(value);
@@ -59,9 +61,11 @@ const EditableLabel: React.FC<EditableLabelProps> = ({
     handleSave();
   };
 
+  const Container = variant === "column" ? ColumnHeader : LabelCell;
+
   if (isEditing) {
     return (
-      <LabelCell backgroundColor={backgroundColor}>
+      <Container backgroundColor={backgroundColor}>
         <input
           ref={inputRef}
           type="text"
@@ -81,12 +85,12 @@ const EditableLabel: React.FC<EditableLabelProps> = ({
             minWidth: "80px",
           }}
         />
-      </LabelCell>
+      </Container>
     );
   }
 
   return (
-    <LabelCell
+    <Container
       backgroundColor={backgroundColor}
       onClick={handleClick}
       style={{
@@ -118,7 +122,7 @@ const EditableLabel: React.FC<EditableLabelProps> = ({
       >
         ✏️
       </span>
-    </LabelCell>
+    </Container>
   );
 };
 

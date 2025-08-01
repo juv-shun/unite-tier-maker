@@ -5,6 +5,7 @@ import { TIERS } from "../constants/tiers";
 import { Pokemon, Position, POSITIONS } from "../data/pokemon";
 import { useTierManagement } from "../hooks/useTierManagement";
 import { usePositionLabels } from "../hooks/usePositionLabels";
+import { useTierLabels } from "../hooks/useTierLabels";
 import {
   ButtonContainer,
   ColumnHeader,
@@ -30,7 +31,12 @@ const TierList: React.FC = () => {
     isPlacedInAnyTier,
   } = useTierManagement();
 
-  const { updatePositionLabel, getPositionLabel, resetToDefaults } = usePositionLabels();
+  const {
+    updatePositionLabel,
+    getPositionLabel,
+    resetToDefaults: resetPositionLabels,
+  } = usePositionLabels();
+  const { updateTierLabel, getTierLabel, resetToDefaults: resetTierLabels } = useTierLabels();
 
   // useMemoを使用してフィルタリングされたポケモンをキャッシュ
   const unassignedPokemon = useMemo(
@@ -86,9 +92,13 @@ const TierList: React.FC = () => {
           <div style={{ display: "flex", flex: 1 }}>
             <EmptyHeaderCell />
             {TIERS.map((tier) => (
-              <ColumnHeader key={tier.id} backgroundColor={tier.color}>
-                {tier.id}
-              </ColumnHeader>
+              <EditableLabel
+                key={tier.id}
+                value={getTierLabel(tier.id)}
+                backgroundColor={tier.color}
+                onSave={(newName) => updateTierLabel(tier.id, newName)}
+                variant="column"
+              />
             ))}
           </div>
 
@@ -150,7 +160,8 @@ const TierList: React.FC = () => {
 
         <ButtonContainer>
           <ResetButton onClick={handleResetTiers}>リセット</ResetButton>
-          <ResetButton onClick={resetToDefaults}>ラベルリセット</ResetButton>
+          <ResetButton onClick={resetPositionLabels}>行ラベルリセット</ResetButton>
+          <ResetButton onClick={resetTierLabels}>列ラベルリセット</ResetButton>
         </ButtonContainer>
       </TierListContainer>
     </DndProvider>
