@@ -110,18 +110,6 @@ const EditableLabel: React.FC<EditableLabelProps> = ({
       }}
     >
       {value}
-      <span
-        style={{
-          position: "absolute",
-          top: "4px",
-          right: "4px",
-          fontSize: "12px",
-          opacity: 0.7,
-          pointerEvents: "none",
-        }}
-      >
-        ✏️
-      </span>
     </Container>
   );
 };
