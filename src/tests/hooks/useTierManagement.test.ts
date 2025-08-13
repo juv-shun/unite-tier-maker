@@ -1,6 +1,5 @@
 import { renderHook, act } from "@testing-library/react";
 import { useTierManagement } from "../../hooks/useTierManagement";
-import { TierId, PokemonAssignment } from "../../types";
 
 // localStorageのモック
 const localStorageMock = (() => {
