@@ -64,6 +64,7 @@ describe("TierList コンポーネント", () => {
       handleDeletePokemon: mockHandleDeletePokemon,
       saveAssignmentsToStorage: jest.fn(),
       isPlacedInAnyTier: jest.fn().mockReturnValue(false),
+      clearAssignmentsForRow: jest.fn(),
     });
   });
 
@@ -303,6 +304,7 @@ describe("TierList コンポーネント", () => {
         handleDeletePokemon: mockHandleDeletePokemon,
         saveAssignmentsToStorage: jest.fn(),
         isPlacedInAnyTier: mockIsPlacedInAnyTier,
+        clearAssignmentsForRow: jest.fn(),
       });
 
       renderTierList();
@@ -351,6 +353,7 @@ describe("TierList コンポーネント", () => {
         handleDeletePokemon: mockHandleDeletePokemon,
         saveAssignmentsToStorage: jest.fn(),
         isPlacedInAnyTier: mockIsPlacedInAnyTier,
+        clearAssignmentsForRow: jest.fn(),
       });
 
       renderTierList();
@@ -389,6 +392,7 @@ describe("TierList コンポーネント", () => {
         handleDeletePokemon: mockHandleDeletePokemon,
         saveAssignmentsToStorage: jest.fn(),
         isPlacedInAnyTier: mockIsPlacedInAnyTier,
+        clearAssignmentsForRow: jest.fn(),
       });
 
       renderTierList();
@@ -429,7 +433,7 @@ describe("TierList コンポーネント", () => {
     test("リセットボタンをクリックするとhandleResetTiersが呼ばれる", () => {
       renderTierList();
 
-      const resetButton = screen.getByText("リセット");
+      const resetButton = screen.getByText("全リセット");
       fireEvent.click(resetButton);
 
       expect(mockHandleResetTiers).toHaveBeenCalled();

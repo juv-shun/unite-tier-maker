@@ -361,6 +361,11 @@ export const useTierManagement = () => {
     [assignments]
   );
 
+  // 指定行（rowId）の配置を全て削除（未配置リストには元から存在するため安全）
+  const clearAssignmentsForRow = useCallback((rowId: string) => {
+    setAssignments((prev) => prev.filter((a) => !a.location.startsWith(`${rowId}-`)));
+  }, []);
+
   return {
     assignments, // フェーズ2以降で内部状態にするか検討
     getPokemonsByLocation,
@@ -369,5 +374,6 @@ export const useTierManagement = () => {
     handleDeletePokemon,
     saveAssignmentsToStorage, // 外部から直接localStorageに保存できるようにエクスポート
     isPlacedInAnyTier, // 新機能: 配置状態判定関数
+    clearAssignmentsForRow,
   };
 };

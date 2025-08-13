@@ -2,9 +2,9 @@ import React, { useMemo } from "react";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { TIERS } from "../constants/tiers";
-import { Pokemon, Position, POSITIONS } from "../data/pokemon";
+import { Pokemon } from "../data/pokemon";
 import { useTierManagement } from "../hooks/useTierManagement";
-import { usePositionLabels } from "../hooks/usePositionLabels";
+import { useRowManager } from "../hooks/useRowManager";
 import { useTierLabels } from "../hooks/useTierLabels";
 import {
   ButtonContainer,
@@ -15,6 +15,9 @@ import {
   TierListHeader,
   UnassignedContainer,
   UnassignedGrid,
+  AddRowIconButton,
+  RowLabelWrapper,
+  RemoveRowButton,
 } from "../styles/TierList.styles";
 import { TierId } from "../types";
 import DraggablePokemon from "./DraggablePokemon";
@@ -28,18 +31,16 @@ const TierList: React.FC = () => {
     handleResetTiers,
     handleDeletePokemon,
     isPlacedInAnyTier,
+    clearAssignmentsForRow,
   } = useTierManagement();
 
-  const {
-    updatePositionLabel,
-    getPositionLabel,
-    resetToDefaults: resetPositionLabels,
-  } = usePositionLabels();
+  const { rows, addRow, removeRow, updateRowLabel, resetRows, getRowLabel, MIN_ROWS, MAX_ROWS } =
+    useRowManager();
   const { updateTierLabel, getTierLabel, resetToDefaults: resetTierLabels } = useTierLabels();
 
   const handleResetAll = () => {
     handleResetTiers();
-    resetPositionLabels();
+    resetRows();
     resetTierLabels();
   };
 
@@ -49,21 +50,21 @@ const TierList: React.FC = () => {
     [getPokemonsByLocation]
   );
 
-  // 各Tierで各ポジション用のポケモンリストをキャッシュ
-  // ポケモンのポジションでフィルタリングしないようにして、どのポケモンもどのポジションにも配置可能にする
+  // 各Tierで各行用のポケモンリストをキャッシュ
+  // どのポジションでも配置可能にする仕様のためフィルタリングはしない
   const tierPositionPokemonMap = useMemo(() => {
-    // Tierごとのマップを作成（行列を入れ替え）
-    const tierMap: Record<string, Record<Position, Pokemon[]>> = {} as Record<
+    // Tierごとのマップを作成（行列を入れ替え）。キーは任意の行ID。
+    const tierMap: Record<string, Record<string, Pokemon[]>> = {} as Record<
       string,
-      Record<Position, Pokemon[]>
+      Record<string, Pokemon[]>
     >;
 
     // 各Tierを初期化
     TIERS.forEach((tier) => {
-      tierMap[tier.id] = {} as Record<Position, Pokemon[]>;
+      tierMap[tier.id] = {} as Record<string, Pokemon[]>;
 
       // 各Tier列に各ポジションのポケモンリストを作成
-      POSITIONS.forEach((position) => {
+      rows.forEach((position, idx) => {
         // ポジションでのフィルタリングを行わない
         // 代わりに、ポジションとTierの組み合わせに対して配置されたポケモンを取得
         const tierLocationKey = `${position.id}-${tier.id}`;
@@ -72,18 +73,11 @@ const TierList: React.FC = () => {
     });
 
     return tierMap;
-  }, [getPokemonsByLocation]);
+  }, [getPokemonsByLocation, rows]);
 
-  // 未配置ポケモンはポジションで分けずに共通で使用
-
-  // ポジションごとの背景色を定義
-  const positionColors = {
-    [Position.TOP_CARRIER]: "#7b68ee", // 紫
-    [Position.TOP_EXP]: "#FFDF7F", // 黄色っぽいオレンジ
-    [Position.JUNGLER]: "#7FBFFF", // 青
-    [Position.BOTTOM_CARRIER]: "#FF7F7F", // 赤
-    [Position.BOTTOM_EXP]: "#7FFF7F", // 緑
-  };
+  // 行ラベルのカラー（オシャレなグラデーション調のパレット）
+  const rowColorPalette = ["#7b68ee", "#FFDF7F", "#7FBFFF", "#FF7F7F", "#7FFF7F", "#00bcd4", "#ff9ecd", "#b39ddb"];
+  const getRowColor = (index: number) => rowColorPalette[index % rowColorPalette.length];
 
   return (
     <DndProvider backend={HTML5Backend}>
@@ -108,14 +102,26 @@ const TierList: React.FC = () => {
           </div>
 
           {/* ポジションごとの行 */}
-          {POSITIONS.map((position) => (
-            <div key={position.id} style={{ display: "flex", marginBottom: 5 }}>
-              {/* 行ラベル */}
-              <EditableLabel
-                value={getPositionLabel(position.id)}
-                backgroundColor={positionColors[position.id]}
-                onSave={(newName) => updatePositionLabel(position.id, newName)}
-              />
+          {rows.map((position, idx) => (
+            <div key={position.id} style={{ display: "flex", marginBottom: 5, alignItems: "center" }}>
+              {/* 行ラベル＋削除ボタン */}
+              <RowLabelWrapper>
+                <EditableLabel
+                  value={getRowLabel(position.id)}
+                  backgroundColor={getRowColor(idx)}
+                  onSave={(newName) => updateRowLabel(position.id, newName)}
+                />
+                <RemoveRowButton
+                  onClick={() => {
+                    removeRow(position.id);
+                    clearAssignmentsForRow(position.id);
+                  }}
+                  disabled={rows.length <= MIN_ROWS}
+                  title={rows.length <= MIN_ROWS ? `最小${MIN_ROWS}行です` : "この行を削除"}
+                >
+                  −
+                </RemoveRowButton>
+              </RowLabelWrapper>
 
               {/* 各Tierセル */}
               {TIERS.map((tier) => (
@@ -132,6 +138,17 @@ const TierList: React.FC = () => {
               ))}
             </div>
           ))}
+
+          {/* 行追加ボタン（最下部・最後の行ラベルの直下にアイコン表示） */}
+          {rows.length < MAX_ROWS && (
+            <div style={{ display: "flex", alignItems: "center", marginTop: 6 }}>
+              <div style={{ width: 130, display: "flex", justifyContent: "center" }}>
+                <AddRowIconButton onClick={addRow} title="行を追加" aria-label="行を追加">
+                  ＋
+                </AddRowIconButton>
+              </div>
+            </div>
+          )}
         </TierListContent>
 
         <UnassignedContainer>
