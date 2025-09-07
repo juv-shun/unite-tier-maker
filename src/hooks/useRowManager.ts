@@ -8,7 +8,7 @@ export interface RowDef {
 
 const STORAGE_KEY = "dynamicRows";
 const MIN_ROWS = 5;
-const MAX_ROWS = 8;
+const MAX_ROWS = 9;
 
 export const useRowManager = () => {
   const defaultRows = useMemo<RowDef[]>(() => {
@@ -97,4 +97,3 @@ export const useRowManager = () => {
     MAX_ROWS,
   };
 };
-
