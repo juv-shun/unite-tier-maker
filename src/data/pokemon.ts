@@ -298,6 +298,12 @@ export const pokemonList: Pokemon[] = [
       "https://tiermaker.com/images/chart/chart/pokemon-unite-tier-list--452797/zzzzz-1733988078ac6375a6-7abc-49aa-bb32-41a1993fa9d7.png",
   },
   {
+    id: "pawmot",
+    name: "パーモット",
+    imageUrl:
+      "https://tiermaker.com/images/chart/chart/pokemon-unite-tier-list--452797/zzzzz-175695302651f7ebb9-8ef0-49ff-8908-08dbf3351d8d.png",
+  },
+  {
     id: "rapidash",
     name: "ギャロップ",
     imageUrl:
