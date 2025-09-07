@@ -17,12 +17,13 @@ import {
   UnassignedGrid,
   AddRowIconButton,
   RowLabelWrapper,
-  RemoveRowButton,
 } from "../styles/TierList.styles";
 import { TierId } from "../types";
 import DraggablePokemon from "./DraggablePokemon";
 import TierRow from "./TierRow";
 import EditableLabel from "./EditableLabel";
+import RowSettingsModal from "./RowSettingsModal";
+import { SettingsButton } from "../styles/rowSettings.styles";
 
 const TierList: React.FC = () => {
   const {
@@ -34,7 +35,17 @@ const TierList: React.FC = () => {
     clearAssignmentsForRow,
   } = useTierManagement();
 
-  const { rows, addRow, removeRow, updateRowLabel, resetRows, getRowLabel, MIN_ROWS, MAX_ROWS } =
+  const {
+    rows,
+    addRow,
+    removeRow,
+    updateRowLabel,
+    updateRowColor,
+    resetRows,
+    getRowLabel,
+    MIN_ROWS,
+    MAX_ROWS,
+  } =
     useRowManager();
   const { updateTierLabel, getTierLabel, resetToDefaults: resetTierLabels } = useTierLabels();
 
@@ -75,9 +86,9 @@ const TierList: React.FC = () => {
     return tierMap;
   }, [getPokemonsByLocation, rows]);
 
-  // 行ラベルのカラー（オシャレなグラデーション調のパレット）
-  const rowColorPalette = ["#7b68ee", "#FFDF7F", "#7FBFFF", "#FF7F7F", "#7FFF7F", "#00bcd4", "#ff9ecd", "#b39ddb"];
-  const getRowColor = (index: number) => rowColorPalette[index % rowColorPalette.length];
+  // 行設定モーダルの開閉状態
+  const [settingsRowId, setSettingsRowId] = React.useState<string | null>(null);
+  const settingsRow = useMemo(() => rows.find((r) => r.id === settingsRowId) || null, [rows, settingsRowId]);
 
   return (
     <DndProvider backend={HTML5Backend}>
@@ -102,25 +113,22 @@ const TierList: React.FC = () => {
           </div>
 
           {/* ポジションごとの行 */}
-          {rows.map((position, idx) => (
+          {rows.map((position) => (
             <div key={position.id} style={{ display: "flex", marginBottom: 5, alignItems: "center" }}>
               {/* 行ラベル＋削除ボタン */}
               <RowLabelWrapper>
                 <EditableLabel
                   value={getRowLabel(position.id)}
-                  backgroundColor={getRowColor(idx)}
+                  backgroundColor={position.color}
                   onSave={(newName) => updateRowLabel(position.id, newName)}
                 />
-                <RemoveRowButton
-                  onClick={() => {
-                    removeRow(position.id);
-                    clearAssignmentsForRow(position.id);
-                  }}
-                  disabled={rows.length <= MIN_ROWS}
-                  title={rows.length <= MIN_ROWS ? `最小${MIN_ROWS}行です` : "この行を削除"}
+                <SettingsButton
+                  onClick={() => setSettingsRowId(position.id)}
+                  title="行の設定"
+                  aria-label="行の設定"
                 >
-                  −
-                </RemoveRowButton>
+                  ⚙
+                </SettingsButton>
               </RowLabelWrapper>
 
               {/* 各Tierセル */}
@@ -183,6 +191,23 @@ const TierList: React.FC = () => {
         <ButtonContainer>
           <ResetButton onClick={handleResetAll}>全リセット</ResetButton>
         </ButtonContainer>
+
+        {/* 行設定モーダル */}
+        <RowSettingsModal
+          open={Boolean(settingsRow)}
+          row={settingsRow}
+          minRows={MIN_ROWS}
+          totalRows={rows.length}
+          onClose={() => setSettingsRowId(null)}
+          onSelectColor={(color) => settingsRow && updateRowColor(settingsRow.id, color)}
+          onDelete={() => {
+            if (!settingsRow) return;
+            if (rows.length <= MIN_ROWS) return;
+            removeRow(settingsRow.id);
+            clearAssignmentsForRow(settingsRow.id);
+            setSettingsRowId(null);
+          }}
+        />
       </TierListContainer>
     </DndProvider>
   );
