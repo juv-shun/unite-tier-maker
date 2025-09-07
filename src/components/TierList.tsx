@@ -199,7 +199,11 @@ const TierList: React.FC = () => {
           minRows={MIN_ROWS}
           totalRows={rows.length}
           onClose={() => setSettingsRowId(null)}
-          onSelectColor={(color) => settingsRow && updateRowColor(settingsRow.id, color)}
+          onSave={(newName, newColor) => {
+            if (!settingsRow) return;
+            updateRowLabel(settingsRow.id, newName);
+            updateRowColor(settingsRow.id, newColor);
+          }}
           onDelete={() => {
             if (!settingsRow) return;
             if (rows.length <= MIN_ROWS) return;

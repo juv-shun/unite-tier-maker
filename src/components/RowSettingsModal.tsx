@@ -1,18 +1,18 @@
 import React from "react";
 import { ROW_COLOR_PALETTE } from "../constants/rowColors";
+import type { RowDef } from "../hooks/useRowManager";
 import {
-  ModalOverlay,
+  CloseButton,
+  ColorSwatch,
+  DangerButton,
+  ModalActions,
   ModalContent,
   ModalHeader,
+  ModalOverlay,
   ModalTitle,
-  CloseButton,
+  PrimaryButton,
   SwatchGrid,
-  ColorSwatch,
-  ModalActions,
-  DangerButton,
-  SecondaryButton,
 } from "../styles/rowSettings.styles";
-import type { RowDef } from "../hooks/useRowManager";
 
 type Props = {
   open: boolean;
@@ -20,8 +20,8 @@ type Props = {
   minRows: number;
   totalRows: number;
   onClose: () => void;
-  onSelectColor: (color: string) => void;
   onDelete: () => void;
+  onSave: (name: string, color: string) => void;
 };
 
 const RowSettingsModal: React.FC<Props> = ({
@@ -30,12 +30,30 @@ const RowSettingsModal: React.FC<Props> = ({
   minRows,
   totalRows,
   onClose,
-  onSelectColor,
   onDelete,
+  onSave,
 }) => {
+  // Hooks must be called unconditionally
+  const [name, setName] = React.useState<string>(row?.name ?? "");
+  const [selectedColor, setSelectedColor] = React.useState<string>(row?.color ?? "");
+
+  React.useEffect(() => {
+    setName(row?.name ?? "");
+    setSelectedColor(row?.color ?? "");
+  }, [row]);
+
   if (!open || !row) return null;
 
   const canDelete = totalRows > minRows;
+  const canSave = name.trim().length > 0;
+
+  const handleSave = () => {
+    const trimmed = name.trim();
+    if (!trimmed) return;
+    const colorToSave = selectedColor || row.color;
+    onSave(trimmed, colorToSave);
+    onClose();
+  };
 
   return (
     <ModalOverlay onClick={onClose}>
@@ -48,8 +66,22 @@ const RowSettingsModal: React.FC<Props> = ({
         </ModalHeader>
 
         <div style={{ marginBottom: 8 }}>
-          <div style={{ fontSize: 12, color: "#555", marginBottom: 6 }}>ラベル: {row.name}</div>
-          <div style={{ fontSize: 12, color: "#555" }}>色を選択:</div>
+          <input
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") handleSave();
+            }}
+            style={{
+              width: "100%",
+              boxSizing: "border-box",
+              padding: 6,
+              border: "1px solid #ccc",
+              borderRadius: 4,
+              marginBottom: 10,
+            }}
+            aria-label="行ラベル名"
+          />
         </div>
 
         <SwatchGrid>
@@ -57,19 +89,29 @@ const RowSettingsModal: React.FC<Props> = ({
             <ColorSwatch
               key={c}
               color={c}
-              selected={row.color === c}
-              onClick={() => onSelectColor(c)}
+              selected={selectedColor ? selectedColor === c : row.color === c}
+              onClick={() => setSelectedColor(c)}
               aria-label={`色 ${c}`}
               title={`色 ${c}`}
-            />)
-          )}
+            />
+          ))}
         </SwatchGrid>
 
         <ModalActions>
-          <DangerButton onClick={onDelete} disabled={!canDelete} title={canDelete ? "この行を削除" : `最小${minRows}行です`}>
+          <DangerButton
+            onClick={onDelete}
+            disabled={!canDelete}
+            title={canDelete ? "この行を削除" : `最小${minRows}行です`}
+          >
             この行を削除
           </DangerButton>
-          <SecondaryButton onClick={onClose}>閉じる</SecondaryButton>
+          <PrimaryButton
+            onClick={handleSave}
+            disabled={!canSave}
+            title={canSave ? "保存" : "名前を入力してください"}
+          >
+            保存
+          </PrimaryButton>
         </ModalActions>
       </ModalContent>
     </ModalOverlay>
@@ -77,4 +119,3 @@ const RowSettingsModal: React.FC<Props> = ({
 };
 
 export default RowSettingsModal;
-

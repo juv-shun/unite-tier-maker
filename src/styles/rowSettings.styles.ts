@@ -82,7 +82,7 @@ export const ColorSwatch = styled.button<{ color: string; selected?: boolean }>`
 
 export const ModalActions = styled.div`
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   gap: 8px;
 `;
 
@@ -94,7 +94,9 @@ export const DangerButton = styled.button`
   border-radius: 4px;
   cursor: pointer;
   &:disabled {
-    opacity: 0.6;
+    background: #bdbdbd; /* grey for disabled */
+    color: #fff;
+    opacity: 1; /* keep readable */
     cursor: not-allowed;
   }
 `;
@@ -108,3 +110,19 @@ export const SecondaryButton = styled.button`
   cursor: pointer;
 `;
 
+export const PrimaryButton = styled.button`
+  padding: 8px 12px;
+  background: #2196f3; /* Blue 500 */
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  &:hover:not(:disabled) {
+    background: #1976d2; /* Blue 700 */
+  }
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+`;
