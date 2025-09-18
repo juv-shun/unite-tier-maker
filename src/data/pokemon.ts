@@ -299,7 +299,7 @@ export const pokemonList: Pokemon[] = [
   },
   {
     id: "galarian_rapidash",
-    name: "ギャロップ",
+    name: "ガラルギャロップ",
     imageUrl:
       "https://s3.ap-northeast-1.amazonaws.com/juv-shun.website-hosting/pokemon_master_data/rapidash_2.jpg",
   },
