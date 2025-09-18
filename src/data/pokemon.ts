@@ -34,7 +34,7 @@ export const pokemonList: Pokemon[] = [
       "https://tiermaker.com/images/chart/chart/pokemon-unite-tier-list--452797/4-pikachujpg.png",
   },
   {
-    id: "raichu",
+    id: "alolan_raichu",
     name: "ライチュウ",
     imageUrl:
       "https://tiermaker.com/images/chart/chart/pokemon-unite-tier-list--452797/zzzzz-17449022163fced3eb-9bcc-43c4-bbcd-b39c3700221f.png",
@@ -46,7 +46,7 @@ export const pokemonList: Pokemon[] = [
       "https://tiermaker.com/images/chart/chart/pokemon-unite-tier-list--452797/zzzzz-16622202994d7d8551-edeb-4a79-b74d-adf3a0b11625jpeg.png",
   },
   {
-    id: "mewtwo-y",
+    id: "mewtwo_y",
     name: "ミュウツーY",
     imageUrl:
       "https://tiermaker.com/images/chart/chart/pokemon-unite-tier-list--452797/zzzzz-16889280954d27ba55-c1fc-4e9d-a197-89ca5ec6d60a.png",
@@ -100,16 +100,10 @@ export const pokemonList: Pokemon[] = [
       "https://tiermaker.com/images/chart/chart/pokemon-unite-tier-list--452797/zz16579521651b315951-c615-4ba2-9ee9-9e3aab976e8cjpeg.png",
   },
   {
-    id: "alolan-ninetales",
+    id: "alolan_ninetales",
     name: "アローラキュウコン",
     imageUrl:
       "https://tiermaker.com/images/chart/chart/pokemon-unite-tier-list--452797/6-a-ninetailsjpg.png",
-  },
-  {
-    id: "alolan-ninetales",
-    name: "アローラキュウコン",
-    imageUrl:
-      "https://unite.pokemon.com/images/pokemon/alolan-ninetales/roster/roster-alolan-ninetales.png",
   },
   {
     id: "decidueye",
@@ -130,7 +124,7 @@ export const pokemonList: Pokemon[] = [
       "https://tiermaker.com/images/chart/chart/pokemon-unite-tier-list--452797/21-cinderacejpg.png",
   },
   {
-    id: "interleon",
+    id: "inteleon",
     name: "インテレオン",
     imageUrl:
       "https://tiermaker.com/images/chart/chart/pokemon-unite-tier-list--452797/zzzzz-16888412192908b3a6-4470-4040-b9ef-9c736a71b177.png",
@@ -190,7 +184,7 @@ export const pokemonList: Pokemon[] = [
       "https://tiermaker.com/images/chart/chart/pokemon-unite-tier-list--452797/zz1639084918906b0238-6560-4e9e-a99b-0839500ec009jpeg.png",
   },
   {
-    id: "mewtwo-x",
+    id: "mewtwo_x",
     name: "ミュウツーX",
     imageUrl:
       "https://tiermaker.com/images/chart/chart/pokemon-unite-tier-list--452797/zzzzz-1688928082db5f4cdc-ed1c-41d5-aa9d-d1f9fd053206.png",
@@ -304,10 +298,10 @@ export const pokemonList: Pokemon[] = [
       "https://tiermaker.com/images/chart/chart/pokemon-unite-tier-list--452797/zzzzz-175695302651f7ebb9-8ef0-49ff-8908-08dbf3351d8d.png",
   },
   {
-    id: "rapidash",
+    id: "galarian_rapidash",
     name: "ギャロップ",
     imageUrl:
-      "https://tiermaker.com/images/chart/chart/pokemon-unite-tier-list--452797/zzzzz-173765516420201f47-d7f8-4570-b250-583a6d05a9e1.png",
+      "https://s3.ap-northeast-1.amazonaws.com/juv-shun.website-hosting/pokemon_master_data/rapidash_2.jpg",
   },
   {
     id: "dodrio",
@@ -454,7 +448,7 @@ export const pokemonList: Pokemon[] = [
       "https://tiermaker.com/images/chart/chart/pokemon-unite-tier-list--452797/zzzzz-1731611667da469b03-06ba-4ee8-ad61-3f42f1cf577b.png",
   },
   {
-    id: "mr-mime",
+    id: "mr_mime",
     name: "バリヤード",
     imageUrl:
       "https://tiermaker.com/images/chart/chart/pokemon-unite-tier-list--452797/11-mr-mimejpg.png",
