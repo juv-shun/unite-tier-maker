@@ -1,4 +1,3 @@
-import { Position } from "../data/pokemon";
 
 /**
  * ポケモンデータの型定義
@@ -7,7 +6,7 @@ export interface Pokemon {
   id: string;
   name: string;
   imageUrl: string;
-  position: Position;
+  type?: string; // S3のデータ形式に合わせてtypeフィールドを追加
 }
 
 /**
@@ -47,3 +46,29 @@ export interface PokemonAssignment {
  * DnDアイテムタイプの定数
  */
 export const DND_ITEM_TYPE = "pokemon" as const;
+
+/**
+ * データロード状態の型定義
+ */
+export interface LoadingState {
+  isLoading: boolean;
+  error: string | null;
+}
+
+/**
+ * キャッシュメタデータの型定義
+ */
+export interface CacheMetadata {
+  etag?: string;
+  lastModified?: string;
+  timestamp: number;
+}
+
+/**
+ * API レスポンスの型定義
+ */
+export interface ApiResponse<T> {
+  data: T;
+  etag?: string;
+  lastModified?: string;
+}

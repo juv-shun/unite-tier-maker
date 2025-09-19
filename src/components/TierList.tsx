@@ -2,10 +2,11 @@ import React, { useMemo } from "react";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { TIERS } from "../constants/tiers";
-import { Pokemon } from "../data/pokemon";
+import { Pokemon } from "../types";
 import { useTierManagement } from "../hooks/useTierManagement";
 import { useRowManager } from "../hooks/useRowManager";
 import { useTierLabels } from "../hooks/useTierLabels";
+import { usePokemon } from "../contexts/PokemonContext";
 import {
   ButtonContainer,
   EmptyHeaderCell,
@@ -26,6 +27,7 @@ import RowSettingsModal from "./RowSettingsModal";
 import { SettingsButton } from "../styles/rowSettings.styles";
 
 const TierList: React.FC = () => {
+  const { loadingState } = usePokemon();
   const {
     getPokemonsByLocation,
     handleMovePokemon,
@@ -89,6 +91,25 @@ const TierList: React.FC = () => {
   // 行設定モーダルの開閉状態
   const [settingsRowId, setSettingsRowId] = React.useState<string | null>(null);
   const settingsRow = useMemo(() => rows.find((r) => r.id === settingsRowId) || null, [rows, settingsRowId]);
+
+  // ローディング状態の表示
+  if (loadingState.isLoading) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px' }}>
+        <p>ポケモンデータをロード中...</p>
+      </div>
+    );
+  }
+
+  // エラー状態の表示
+  if (loadingState.error) {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: '200px' }}>
+        <p>エラーが発生しました: {loadingState.error}</p>
+        <button onClick={() => window.location.reload()}>リロード</button>
+      </div>
+    );
+  }
 
   return (
     <DndProvider backend={HTML5Backend}>

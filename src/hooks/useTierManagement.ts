@@ -1,6 +1,6 @@
 import { useState, useCallback, useMemo, useEffect } from "react";
-import { Pokemon, pokemonList } from "../data/pokemon";
-import { PokemonAssignment, TierId } from "../types";
+import { Pokemon, PokemonAssignment, TierId } from "../types";
+import { usePokemon } from "../contexts/PokemonContext";
 
 // 型定義とTIERSは types と constants に移動しました
 
@@ -10,6 +10,8 @@ const generateAssignmentId = (): string => {
 };
 
 export const useTierManagement = () => {
+  const { pokemonList, getPokemonById } = usePokemon();
+
   // ポケモンの元の順序を保持するマップを作成
   const pokemonOriginalOrderMap = useMemo(() => {
     const orderMap: Record<string, number> = {};
@@ -17,7 +19,7 @@ export const useTierManagement = () => {
       orderMap[pokemon.id] = index;
     });
     return orderMap;
-  }, []);
+  }, [pokemonList]);
 
   // localStorageから保存されたassignmentsを取得する関数
   const getSavedAssignments = useCallback((): PokemonAssignment[] | null => {
@@ -37,6 +39,11 @@ export const useTierManagement = () => {
 
   // 初期状態を設定
   const initialAssignments = useMemo(() => {
+    // ポケモンリストが空の場合は空の配列を返す（ロード中）
+    if (pokemonList.length === 0) {
+      return [];
+    }
+
     console.log("初期状態の設定を開始");
     let assignmentsToInitialize: PokemonAssignment[] = [];
     const savedAssignments = getSavedAssignments();
@@ -88,14 +95,26 @@ export const useTierManagement = () => {
 
     // ソートされた未配置ポケモンを他のポケモンと結合
     return [...otherAssignments, ...unassignedToSort];
-  }, [getSavedAssignments, pokemonOriginalOrderMap]);
+  }, [getSavedAssignments, pokemonOriginalOrderMap, pokemonList]);
 
   // assignmentIdを追加して、同じポケモンが複数の場所に配置できるようにする
   const [assignments, setAssignments] = useState<PokemonAssignment[]>(initialAssignments);
 
-  const getPokemonById = useCallback((id: string): Pokemon | undefined => {
-    return pokemonList.find((pokemon) => pokemon.id === id);
-  }, []);
+  // ポケモンリストが変更されたら、assignmentsを再初期化する
+  useEffect(() => {
+    if (pokemonList.length > 0 && assignments.length === 0) {
+      const newAssignments = pokemonList.map((pokemon, index) => ({
+        id: generateAssignmentId(),
+        pokemonId: pokemon.id,
+        location: TierId.UNASSIGNED,
+        position: index,
+        isFromUnassignedArea: true,
+      }));
+      setAssignments(newAssignments);
+    }
+  }, [pokemonList, assignments.length]);
+
+  // コンテキストから取得したgetPokemonByIdを使用
 
   const getPokemonsByLocation = useCallback(
     (location: string): Pokemon[] => {
@@ -340,7 +359,7 @@ export const useTierManagement = () => {
     // リセット時にlocalStorageもクリア
     localStorage.removeItem("tierAssignments");
     console.log("Tierリセット: localStorageをクリアしました");
-  }, []);
+  }, [pokemonList]);
 
   // ポケモンを削除する関数
   const handleDeletePokemon = useCallback((pokemonId: string, assignmentId: string) => {

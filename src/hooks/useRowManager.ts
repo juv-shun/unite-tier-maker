@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { POSITIONS } from "../data/pokemon";
+import { POSITIONS } from "../constants/positions";
 import { ROW_COLOR_PALETTE } from "../constants/rowColors";
 
 export interface RowDef {

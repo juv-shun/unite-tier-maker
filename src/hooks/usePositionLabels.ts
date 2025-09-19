@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from "react";
-import { Position, POSITIONS } from "../data/pokemon";
+import { Position, POSITIONS } from "../constants/positions";
 
 const STORAGE_KEY = "positionLabels";
 

@@ -1,6 +1,6 @@
 import React, { useRef, memo } from "react";
 import { useDrop } from "react-dnd";
-import { Pokemon } from "../data/pokemon";
+import { Pokemon } from "../types";
 import DraggablePokemon from "./DraggablePokemon";
 import { DragItem, DND_ITEM_TYPE } from "../types";
 import { TierRowContainer, TierLabel, TierContent } from "../styles/TierRow.styles";
