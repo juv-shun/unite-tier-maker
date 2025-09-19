@@ -25,10 +25,8 @@ export const useTierManagement = () => {
   const getSavedAssignments = useCallback((): PokemonAssignment[] | null => {
     try {
       const savedAssignments = localStorage.getItem("tierAssignments");
-      console.log("localStorageから読み込まれた状態:", savedAssignments);
       if (savedAssignments) {
         const parsed = JSON.parse(savedAssignments);
-        console.log("パース後の状態:", parsed);
         return parsed;
       }
     } catch (e) {
@@ -44,15 +42,12 @@ export const useTierManagement = () => {
       return [];
     }
 
-    console.log("初期状態の設定を開始");
     let assignmentsToInitialize: PokemonAssignment[] = [];
     const savedAssignments = getSavedAssignments();
 
     if (savedAssignments && savedAssignments.length > 0) {
-      console.log("保存された状態を使用します");
       assignmentsToInitialize = [...savedAssignments];
     } else {
-      console.log("新しい初期状態を作成します（保存データなし）");
       // 保存された状態がない場合は初期状態を作成
       assignmentsToInitialize = pokemonList.map((pokemon, index) => ({
         id: generateAssignmentId(),
@@ -65,9 +60,10 @@ export const useTierManagement = () => {
 
     // pokemonListに存在するが、assignmentsToInitializeに存在しないポケモンを未配置として追加
     const existingPokemonIds = new Set(assignmentsToInitialize.map((a) => a.pokemonId));
+    let newPokemonCount = 0;
     pokemonList.forEach((pokemon, index) => {
       if (!existingPokemonIds.has(pokemon.id)) {
-        console.log(`新しいポケモン ${pokemon.name} を未配置に追加します`);
+        newPokemonCount++;
         assignmentsToInitialize.push({
           id: generateAssignmentId(),
           pokemonId: pokemon.id,
@@ -77,6 +73,10 @@ export const useTierManagement = () => {
         });
       }
     });
+
+    if (newPokemonCount > 0) {
+      console.log(`${newPokemonCount}件の新しいポケモンを追加しました`);
+    }
 
     // 未配置エリアのポケモンの順序を pokemonList の順序に合わせる
     // (TierId.UNASSIGNED のポケモンのみを対象とし、pokemonOriginalOrderMap を使ってソート)
@@ -170,10 +170,7 @@ export const useTierManagement = () => {
   const saveAssignmentsToStorage = useCallback((assignments: PokemonAssignment[]) => {
     try {
       const assignmentsStr = JSON.stringify(assignments);
-      console.log("localStorageに保存する状態:", assignmentsStr);
       localStorage.setItem("tierAssignments", assignmentsStr);
-      // 保存されたことを確認
-      console.log("保存後のlocalStorage:", localStorage.getItem("tierAssignments"));
     } catch (e) {
       console.error("localStorageへの保存に失敗しました:", e);
     }
@@ -181,17 +178,13 @@ export const useTierManagement = () => {
 
   // 状態が変更されたらlocalStorageに保存
   useEffect(() => {
-    console.log("状態が変更されました、localStorageに保存します");
     saveAssignmentsToStorage(assignments);
   }, [assignments, saveAssignmentsToStorage]);
 
   // 初回マウント時に一度localStorageに保存して確認
   useEffect(() => {
-    console.log("コンポーネントがマウントされました");
     const savedData = localStorage.getItem("tierAssignments");
-    console.log("現在のlocalStorage状態:", savedData);
     if (!savedData) {
-      console.log("初期状態をlocalStorageに保存します");
       saveAssignmentsToStorage(assignments);
     }
   }, [assignments, saveAssignmentsToStorage]); // 依存配列に必要な値を追加
@@ -358,7 +351,6 @@ export const useTierManagement = () => {
     setAssignments(resetAssignments);
     // リセット時にlocalStorageもクリア
     localStorage.removeItem("tierAssignments");
-    console.log("Tierリセット: localStorageをクリアしました");
   }, [pokemonList]);
 
   // ポケモンを削除する関数
