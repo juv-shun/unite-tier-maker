@@ -35,84 +35,76 @@ export const useTierManagement = () => {
     return null;
   }, []);
 
-  // 初期状態を設定
-  const initialAssignments = useMemo(() => {
-    // ポケモンリストが空の場合は空の配列を返す（ロード中）
-    if (pokemonList.length === 0) {
-      return [];
-    }
 
-    let assignmentsToInitialize: PokemonAssignment[] = [];
-    const savedAssignments = getSavedAssignments();
+  // assignmentIdを追加して、同じポケモンが複数の場所に配置できるようにする
+  const [assignments, setAssignments] = useState<PokemonAssignment[]>([]);
 
-    if (savedAssignments && savedAssignments.length > 0) {
-      assignmentsToInitialize = [...savedAssignments];
-    } else {
-      // 保存された状態がない場合は初期状態を作成
-      assignmentsToInitialize = pokemonList.map((pokemon, index) => ({
-        id: generateAssignmentId(),
-        pokemonId: pokemon.id,
-        location: TierId.UNASSIGNED,
-        position: index,
-        isFromUnassignedArea: true,
-      }));
-    }
+  // ポケモンデータがロードされた時にlocalStorageから復元または新規作成
+  useEffect(() => {
+    if (pokemonList.length > 0 && assignments.length === 0) {
+      let assignmentsToInitialize: PokemonAssignment[] = [];
+      const savedAssignments = getSavedAssignments();
 
-    // pokemonListに存在するが、assignmentsToInitializeに存在しないポケモンを未配置として追加
-    const existingPokemonIds = new Set(assignmentsToInitialize.map((a) => a.pokemonId));
-    let newPokemonCount = 0;
-    pokemonList.forEach((pokemon, index) => {
-      if (!existingPokemonIds.has(pokemon.id)) {
-        newPokemonCount++;
-        assignmentsToInitialize.push({
+
+      if (savedAssignments && savedAssignments.length > 0) {
+        // 保存データがある場合は復元
+        assignmentsToInitialize = [...savedAssignments];
+      } else {
+        // 保存データがない場合は新規作成
+        assignmentsToInitialize = pokemonList.map((pokemon, index) => ({
           id: generateAssignmentId(),
           pokemonId: pokemon.id,
           location: TierId.UNASSIGNED,
-          position: pokemonOriginalOrderMap[pokemon.id] ?? index, // 元の順序を維持、なければ末尾
+          position: index,
           isFromUnassignedArea: true,
-        });
+        }));
       }
-    });
 
-    if (newPokemonCount > 0) {
-      console.log(`${newPokemonCount}件の新しいポケモンを追加しました`);
+      // 保存データがある場合は、無効なポケモンIDの配置データを除外
+      if (savedAssignments && savedAssignments.length > 0) {
+        const validPokemonIds = new Set(pokemonList.map((p) => p.id));
+
+        assignmentsToInitialize = assignmentsToInitialize.filter((a) =>
+          validPokemonIds.has(a.pokemonId)
+        );
+      }
+
+      // pokemonListに存在するが、assignmentsToInitializeに存在しないポケモンを未配置として追加
+      const existingPokemonIds = new Set(assignmentsToInitialize.map((a) => a.pokemonId));
+      let newPokemonCount = 0;
+      pokemonList.forEach((pokemon, index) => {
+        if (!existingPokemonIds.has(pokemon.id)) {
+          newPokemonCount++;
+          assignmentsToInitialize.push({
+            id: generateAssignmentId(),
+            pokemonId: pokemon.id,
+            location: TierId.UNASSIGNED,
+            position: pokemonOriginalOrderMap[pokemon.id] ?? index,
+            isFromUnassignedArea: true,
+          });
+        }
+      });
+
+
+      // 未配置エリアのポケモンの順序を pokemonList の順序に合わせる
+      const unassignedToSort = assignmentsToInitialize.filter(
+        (a) => a.location === TierId.UNASSIGNED
+      );
+      const otherAssignments = assignmentsToInitialize.filter(
+        (a) => a.location !== TierId.UNASSIGNED
+      );
+
+      unassignedToSort.sort(
+        (a, b) =>
+          (pokemonOriginalOrderMap[a.pokemonId] ?? Infinity) -
+          (pokemonOriginalOrderMap[b.pokemonId] ?? Infinity)
+      );
+
+      // 最終的なassignmentsをセット
+      const finalAssignments = [...otherAssignments, ...unassignedToSort];
+      setAssignments(finalAssignments);
     }
-
-    // 未配置エリアのポケモンの順序を pokemonList の順序に合わせる
-    // (TierId.UNASSIGNED のポケモンのみを対象とし、pokemonOriginalOrderMap を使ってソート)
-    const unassignedToSort = assignmentsToInitialize.filter(
-      (a) => a.location === TierId.UNASSIGNED
-    );
-    const otherAssignments = assignmentsToInitialize.filter(
-      (a) => a.location !== TierId.UNASSIGNED
-    );
-
-    unassignedToSort.sort(
-      (a, b) =>
-        (pokemonOriginalOrderMap[a.pokemonId] ?? Infinity) -
-        (pokemonOriginalOrderMap[b.pokemonId] ?? Infinity)
-    );
-
-    // ソートされた未配置ポケモンを他のポケモンと結合
-    return [...otherAssignments, ...unassignedToSort];
-  }, [getSavedAssignments, pokemonOriginalOrderMap, pokemonList]);
-
-  // assignmentIdを追加して、同じポケモンが複数の場所に配置できるようにする
-  const [assignments, setAssignments] = useState<PokemonAssignment[]>(initialAssignments);
-
-  // ポケモンリストが変更されたら、assignmentsを再初期化する
-  useEffect(() => {
-    if (pokemonList.length > 0 && assignments.length === 0) {
-      const newAssignments = pokemonList.map((pokemon, index) => ({
-        id: generateAssignmentId(),
-        pokemonId: pokemon.id,
-        location: TierId.UNASSIGNED,
-        position: index,
-        isFromUnassignedArea: true,
-      }));
-      setAssignments(newAssignments);
-    }
-  }, [pokemonList, assignments.length]);
+  }, [pokemonList, assignments.length, getSavedAssignments, pokemonOriginalOrderMap]);
 
   // コンテキストから取得したgetPokemonByIdを使用
 
@@ -178,7 +170,9 @@ export const useTierManagement = () => {
 
   // 状態が変更されたらlocalStorageに保存
   useEffect(() => {
-    saveAssignmentsToStorage(assignments);
+    if (assignments.length > 0) {
+      saveAssignmentsToStorage(assignments);
+    }
   }, [assignments, saveAssignmentsToStorage]);
 
   // 初回マウント時に一度localStorageに保存して確認
@@ -278,7 +272,7 @@ export const useTierManagement = () => {
 
           // 位置情報を更新して最終的なアサインメントリストを作成
           const finalAssignments: PokemonAssignment[] = [];
-          Object.entries(locationGroupedAssignments).forEach(([locationKey, assignments]) => {
+          Object.entries(locationGroupedAssignments).forEach(([, assignments]) => {
             assignments.forEach((assignment, index) => {
               assignment.position = index;
               finalAssignments.push(assignment);
@@ -325,7 +319,7 @@ export const useTierManagement = () => {
 
           // 位置情報を更新して最終的なアサインメントリストを作成
           const finalAssignments: PokemonAssignment[] = [];
-          Object.entries(locationGroupedAssignments).forEach(([locationKey, assignments]) => {
+          Object.entries(locationGroupedAssignments).forEach(([, assignments]) => {
             assignments.forEach((assignment, index) => {
               assignment.position = index;
               finalAssignments.push(assignment);
@@ -354,7 +348,7 @@ export const useTierManagement = () => {
   }, [pokemonList]);
 
   // ポケモンを削除する関数
-  const handleDeletePokemon = useCallback((pokemonId: string, assignmentId: string) => {
+  const handleDeletePokemon = useCallback((_pokemonId: string, assignmentId: string) => {
     setAssignments((prevAssignments) => {
       // 指定されたアサインメントIDのポケモンを削除
       return prevAssignments.filter((a) => a.id !== assignmentId);
