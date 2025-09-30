@@ -71,10 +71,8 @@ export const useTierManagement = () => {
 
       // pokemonListに存在するが、assignmentsToInitializeに存在しないポケモンを未配置として追加
       const existingPokemonIds = new Set(assignmentsToInitialize.map((a) => a.pokemonId));
-      let newPokemonCount = 0;
       pokemonList.forEach((pokemon, index) => {
         if (!existingPokemonIds.has(pokemon.id)) {
-          newPokemonCount++;
           assignmentsToInitialize.push({
             id: generateAssignmentId(),
             pokemonId: pokemon.id,
