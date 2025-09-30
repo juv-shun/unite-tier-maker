@@ -135,7 +135,7 @@ const TierList: React.FC = () => {
 
           {/* ポジションごとの行 */}
           {rows.map((position) => (
-            <div key={position.id} style={{ display: "flex", marginBottom: 5, alignItems: "center" }}>
+            <div key={position.id} style={{ display: "grid", gridTemplateColumns: "130px 1fr 1fr 1fr 1fr", marginBottom: 5, gap: 0 }}>
               {/* 行ラベル＋削除ボタン */}
               <RowLabelWrapper>
                 <EditableLabel

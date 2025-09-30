@@ -73,7 +73,8 @@ export const LabelCell = styled.div<{ backgroundColor: string }>`
   font-weight: bold;
   border-radius: 4px;
   width: 130px;
-  height: 70px;
+  min-height: 70px;
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -170,7 +171,7 @@ export const AddRowIconButton = styled.button`
 export const RowLabelWrapper = styled.div`
   position: relative;
   width: 130px;
-  height: 70px;
+  min-height: 70px;
 `;
 
 export const RemoveRowButton = styled.button`

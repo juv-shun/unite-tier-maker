@@ -6,6 +6,7 @@ import styled from "@emotion/styled";
 export const TierRowContainer = styled.div`
   display: flex;
   flex: 1;
+  height: 100%;
 `;
 
 export const TierLabel = styled.div<{ backgroundColor: string }>`
