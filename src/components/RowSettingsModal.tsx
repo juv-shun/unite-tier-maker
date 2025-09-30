@@ -70,7 +70,10 @@ const RowSettingsModal: React.FC<Props> = ({
             value={name}
             onChange={(e) => setName(e.target.value)}
             onKeyDown={(e) => {
-              if (e.key === "Enter") handleSave();
+              // IME変換中のEnterは無視
+              if (e.key === "Enter" && !e.nativeEvent.isComposing) {
+                handleSave();
+              }
             }}
             style={{
               width: "100%",
