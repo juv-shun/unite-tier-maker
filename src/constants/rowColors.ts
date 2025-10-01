@@ -10,4 +10,3 @@ export const ROW_COLOR_PALETTE: string[] = [
   "#ffa726", // orange
   "#607d8b", // blue grey
 ];
-

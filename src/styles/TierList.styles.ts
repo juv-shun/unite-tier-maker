@@ -157,7 +157,10 @@ export const AddRowIconButton = styled.button`
   font-size: 18px;
   line-height: 1;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
-  transition: transform 0.15s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.2s ease,
+    opacity 0.2s ease;
   &:hover {
     transform: scale(1.05);
     box-shadow: 0 8px 14px rgba(0, 0, 0, 0.18);
@@ -190,7 +193,10 @@ export const RemoveRowButton = styled.button`
   align-items: center;
   justify-content: center;
   font-weight: bold;
-  transition: transform 0.15s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.2s ease,
+    opacity 0.2s ease;
   &:hover {
     transform: scale(1.05);
     box-shadow: 0 8px 14px rgba(0, 0, 0, 0.18);

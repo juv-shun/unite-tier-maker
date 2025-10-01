@@ -1,12 +1,16 @@
-import { Pokemon, ApiResponse, CacheMetadata } from '../types';
-import { API_CONFIG, STORAGE_KEYS } from '../config/api';
+import { Pokemon, ApiResponse, CacheMetadata } from "../types";
+import { API_CONFIG, STORAGE_KEYS } from "../config/api";
 
 class PokemonDataService {
   private async sleep(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
-  private async fetchWithRetry(url: string, options: RequestInit, retries: number = API_CONFIG.RETRY_ATTEMPTS): Promise<Response> {
+  private async fetchWithRetry(
+    url: string,
+    options: RequestInit,
+    retries: number = API_CONFIG.RETRY_ATTEMPTS
+  ): Promise<Response> {
     for (let i = 0; i < retries; i++) {
       try {
         const controller = new AbortController();
@@ -24,7 +28,7 @@ class PokemonDataService {
         await this.sleep(API_CONFIG.RETRY_DELAY * (i + 1));
       }
     }
-    throw new Error('All retry attempts failed');
+    throw new Error("All retry attempts failed");
   }
 
   private getCachedMetadata(): CacheMetadata | null {
@@ -40,7 +44,7 @@ class PokemonDataService {
     try {
       localStorage.setItem(STORAGE_KEYS.POKEMON_METADATA, JSON.stringify(metadata));
     } catch (error) {
-      console.warn('Failed to save metadata to localStorage:', error);
+      console.warn("Failed to save metadata to localStorage:", error);
     }
   }
 
@@ -57,13 +61,13 @@ class PokemonDataService {
     try {
       localStorage.setItem(STORAGE_KEYS.POKEMON_DATA, JSON.stringify(data));
     } catch (error) {
-      console.warn('Failed to save data to localStorage:', error);
+      console.warn("Failed to save data to localStorage:", error);
     }
   }
 
   private isCacheValid(metadata: CacheMetadata): boolean {
     const now = Date.now();
-    return (now - metadata.timestamp) < API_CONFIG.CACHE_DURATION;
+    return now - metadata.timestamp < API_CONFIG.CACHE_DURATION;
   }
 
   async fetchPokemonData(): Promise<ApiResponse<Pokemon[]>> {
@@ -73,16 +77,16 @@ class PokemonDataService {
     // キャッシュが有効で、ETAGが存在する場合は条件付きリクエストを送信
     if (cachedMetadata && this.isCacheValid(cachedMetadata)) {
       if (cachedMetadata.etag) {
-        headers['If-None-Match'] = cachedMetadata.etag;
+        headers["If-None-Match"] = cachedMetadata.etag;
       }
       if (cachedMetadata.lastModified) {
-        headers['If-Modified-Since'] = cachedMetadata.lastModified;
+        headers["If-Modified-Since"] = cachedMetadata.lastModified;
       }
     }
 
     try {
       const response = await this.fetchWithRetry(API_CONFIG.POKEMON_DATA_URL, {
-        method: 'GET',
+        method: "GET",
         headers,
       });
 
@@ -103,8 +107,8 @@ class PokemonDataService {
       }
 
       const data: Pokemon[] = await response.json();
-      const etag = response.headers.get('etag') || undefined;
-      const lastModified = response.headers.get('last-modified') || undefined;
+      const etag = response.headers.get("etag") || undefined;
+      const lastModified = response.headers.get("last-modified") || undefined;
 
       // 新しいデータとメタデータをキャッシュ
       this.setCachedData(data);
@@ -130,7 +134,7 @@ class PokemonDataService {
       localStorage.removeItem(STORAGE_KEYS.POKEMON_DATA);
       localStorage.removeItem(STORAGE_KEYS.POKEMON_METADATA);
     } catch (error) {
-      console.warn('Failed to clear cache:', error);
+      console.warn("Failed to clear cache:", error);
     }
   }
 }

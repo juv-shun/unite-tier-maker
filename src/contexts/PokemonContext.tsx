@@ -48,10 +48,10 @@ export const PokemonProvider: React.FC<{ children: ReactNode }> = ({ children })
       setPokemonList(response.data);
       setLoadingState({ isLoading: false, error: null });
     } catch (error) {
-      console.error('Failed to fetch pokemon data:', error);
+      console.error("Failed to fetch pokemon data:", error);
       setLoadingState({
         isLoading: false,
-        error: error instanceof Error ? error.message : 'データの取得に失敗しました',
+        error: error instanceof Error ? error.message : "データの取得に失敗しました",
       });
       // エラー時は空の配列を設定
       setPokemonList([]);

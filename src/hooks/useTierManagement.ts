@@ -35,7 +35,6 @@ export const useTierManagement = () => {
     return null;
   }, []);
 
-
   // assignmentIdを追加して、同じポケモンが複数の場所に配置できるようにする
   const [assignments, setAssignments] = useState<PokemonAssignment[]>([]);
 
@@ -44,7 +43,6 @@ export const useTierManagement = () => {
     if (pokemonList.length > 0 && assignments.length === 0) {
       let assignmentsToInitialize: PokemonAssignment[] = [];
       const savedAssignments = getSavedAssignments();
-
 
       if (savedAssignments && savedAssignments.length > 0) {
         // 保存データがある場合は復元
@@ -82,7 +80,6 @@ export const useTierManagement = () => {
           });
         }
       });
-
 
       // 未配置エリアのポケモンの順序を pokemonList の順序に合わせる
       const unassignedToSort = assignmentsToInitialize.filter(
