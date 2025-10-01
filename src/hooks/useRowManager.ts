@@ -106,6 +106,15 @@ export const useRowManager = () => {
     [rows]
   );
 
+  const reorderRows = useCallback((dragIndex: number, hoverIndex: number) => {
+    setRows((prev) => {
+      const newRows = [...prev];
+      const [draggedRow] = newRows.splice(dragIndex, 1);
+      newRows.splice(hoverIndex, 0, draggedRow);
+      return newRows;
+    });
+  }, []);
+
   return {
     rows,
     addRow,
@@ -114,6 +123,7 @@ export const useRowManager = () => {
     updateRowColor,
     resetRows,
     getRowLabel,
+    reorderRows,
     MIN_ROWS,
     MAX_ROWS,
   };

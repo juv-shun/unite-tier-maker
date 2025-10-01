@@ -1,4 +1,3 @@
-
 /**
  * ポケモンデータの型定義
  */
@@ -32,6 +31,14 @@ export interface DragItem {
 }
 
 /**
+ * 行のドラッグ＆ドロップアイテムの型定義
+ */
+export interface RowDragItem {
+  rowId: string;
+  originalIndex: number;
+}
+
+/**
  * ポケモン配置情報の型定義
  */
 export interface PokemonAssignment {
@@ -46,6 +53,7 @@ export interface PokemonAssignment {
  * DnDアイテムタイプの定数
  */
 export const DND_ITEM_TYPE = "pokemon" as const;
+export const ROW_DND_ITEM_TYPE = "row" as const;
 
 /**
  * データロード状態の型定義

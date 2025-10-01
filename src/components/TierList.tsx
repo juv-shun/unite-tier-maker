@@ -25,6 +25,7 @@ import TierRow from "./TierRow";
 import EditableLabel from "./EditableLabel";
 import RowSettingsModal from "./RowSettingsModal";
 import { SettingsButton } from "../styles/rowSettings.styles";
+import DraggableRow from "./DraggableRow";
 
 const TierList: React.FC = () => {
   const { loadingState } = usePokemon();
@@ -45,10 +46,10 @@ const TierList: React.FC = () => {
     updateRowColor,
     resetRows,
     getRowLabel,
+    reorderRows,
     MIN_ROWS,
     MAX_ROWS,
-  } =
-    useRowManager();
+  } = useRowManager();
   const { updateTierLabel, getTierLabel, resetToDefaults: resetTierLabels } = useTierLabels();
 
   const handleResetAll = () => {
@@ -90,12 +91,17 @@ const TierList: React.FC = () => {
 
   // 行設定モーダルの開閉状態
   const [settingsRowId, setSettingsRowId] = React.useState<string | null>(null);
-  const settingsRow = useMemo(() => rows.find((r) => r.id === settingsRowId) || null, [rows, settingsRowId]);
+  const settingsRow = useMemo(
+    () => rows.find((r) => r.id === settingsRowId) || null,
+    [rows, settingsRowId]
+  );
 
   // ローディング状態の表示
   if (loadingState.isLoading) {
     return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px' }}>
+      <div
+        style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "200px" }}
+      >
         <p>ポケモンデータをロード中...</p>
       </div>
     );
@@ -104,7 +110,15 @@ const TierList: React.FC = () => {
   // エラー状態の表示
   if (loadingState.error) {
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: '200px' }}>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "200px",
+        }}
+      >
         <p>エラーが発生しました: {loadingState.error}</p>
         <button onClick={() => window.location.reload()}>リロード</button>
       </div>
@@ -134,8 +148,13 @@ const TierList: React.FC = () => {
           </div>
 
           {/* ポジションごとの行 */}
-          {rows.map((position) => (
-            <div key={position.id} style={{ display: "grid", gridTemplateColumns: "130px 1fr 1fr 1fr 1fr", marginBottom: 5, gap: 0 }}>
+          {rows.map((position, index) => (
+            <DraggableRow
+              key={position.id}
+              rowId={position.id}
+              index={index}
+              onReorderRow={reorderRows}
+            >
               {/* 行ラベル＋削除ボタン */}
               <RowLabelWrapper>
                 <EditableLabel
@@ -165,7 +184,7 @@ const TierList: React.FC = () => {
                   hideLabel={true}
                 />
               ))}
-            </div>
+            </DraggableRow>
           ))}
 
           {/* 行追加ボタン（最下部・最後の行ラベルの直下にアイコン表示） */}
