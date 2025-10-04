@@ -35,9 +35,13 @@ const TierRow: React.FC<TierRowProps> = ({
 
   const [{ isOver }, connectDrop] = useDrop<DragItem, void, { isOver: boolean }>(() => ({
     accept: DND_ITEM_TYPE,
-    drop: (item: DragItem) => {
-      // TierRowの空きスペースにドロップされた場合、このTierの末尾に追加
-      // 異なるティア間の移動、または同じティア内での末尾への移動を許可
+    drop: (item: DragItem, monitor) => {
+      // 子要素（DraggablePokemon）で既に処理されている場合は何もしない
+      if (monitor.didDrop()) {
+        return undefined;
+      }
+
+      // TierRowの空きスペースに直接ドロップされた場合のみ、このTierの末尾に追加
       onMovePokemon(
         { pokemonId: item.id, assignmentId: item.assignmentId },
         locationKey,
