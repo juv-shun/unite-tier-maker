@@ -10,16 +10,16 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ```bash
 # 開発サーバー起動
-npm start
+pnpm start
 
 # プロダクションビルド
-npm run build
+pnpm run build
 
 # テスト実行
-npm test
+pnpm test
 
 # コードフォーマット
-npx prettier --write src/
+pnpm exec prettier --write src/
 ```
 
 ## アーキテクチャ

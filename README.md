@@ -14,7 +14,7 @@
 - フレームワーク: React (TypeScript)
 - ドラッグ＆ドロップ: react-dnd + react-dnd-html5-backend
 - スタイリング: Emotion (@emotion/react, @emotion/styled)
-- パッケージ管理: npm
+- パッケージ管理: pnpm
 - テスト: @testing-library/react
 - コード品質: ESLint, TypeScript
 
@@ -26,14 +26,14 @@ git clone https://github.com/juv-shun/unite-tier-maker.git
 cd unite-tier-maker
 
 # 依存関係をインストール
-npm install
+pnpm install
 ```
 
 ## 実行
 
 ```bash
 # 開発用サーバー起動
-npm start
+pnpm start
 ```
 
 ブラウザで http://localhost:3000 を開きます。
@@ -42,7 +42,7 @@ npm start
 
 ```bash
 # 本番用ビルド
-npm run build
+pnpm run build
 ```
 
 ## プロジェクト構成
